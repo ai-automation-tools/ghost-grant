@@ -1,0 +1,29 @@
+{
+  "name": "ghostgrant",
+  "version": "0.0.0",
+  "description": "Checks that every credential a retired AI agent held has actually stopped working, and keeps checking.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Mike Schecht",
+  "bin": {
+    "ghostgrant": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "node --test",
+    "lint": "eslint . && tsc --noEmit"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/node": "^22.20.4",
+    "eslint": "^9.39.5",
+    "typescript": "~6.0",
+    "typescript-eslint": "^8.70.1"
+  }
+}
