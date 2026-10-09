@@ -21,6 +21,12 @@
 | [**🗺️ ROADMAP.md**](ROADMAP.md) | The release gates, one per weekly run, plus what waits until after the repo goes public. |
 | [**📋 CHANGELOG.md**](CHANGELOG.md) | Every change, newest first. Roadmap items show up here the week they're ticked. |
 
+## 🧰 Using it
+
+| Document | What's inside |
+|:---|:---|
+| [**📝 manifest.md**](manifest.md) | The manifest's fields, what gets rejected, and where records are kept. |
+
 ## 📦 Product
 
 | Section | What's inside |

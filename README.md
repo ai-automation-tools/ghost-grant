@@ -33,10 +33,9 @@
 ---
 
 > [!WARNING]
-> **Nothing gets checked yet.** This is the scaffold. The CLI answers `--help` and
-> `--version`, and every real command says it isn't built. The first slice is a walking
-> skeleton that runs the whole flow against canned provider responses. See the
-> [roadmap](docs/ROADMAP.md).
+> **No provider gets called yet.** `decommission` records a manifest and `check --mock`
+> answers every credential from canned responses. The GitHub, Slack and AWS adapters come
+> next. See the [roadmap](docs/ROADMAP.md).
 
 ## 💡 What it's for
 
@@ -53,12 +52,12 @@ report saying what was checked and what happened.
 
 It is a local CLI. There's no GhostGrant server, no account, and no telemetry.
 
-## 📊 Planned features
+## 📊 Features
 
 | Feature | Status |
 |:---|:---|
-| **`ghostgrant decommission <manifest>`** | Slice 0. Records a decommission entry with a timestamp and the manifest's checksum |
-| **`--mock` mode** | Slice 0. Every command runs against canned provider responses |
+| **`ghostgrant decommission <manifest>`** | ✅ Records a decommission entry with a timestamp and the manifest's checksum. [Manifest format](docs/manifest.md) |
+| **`ghostgrant check --mock`** | ✅ Answers every recorded credential from canned responses and prints alive/dead |
 | **GitHub and Slack adapters** | Slices 1 and 2. Alive/dead from the provider's own endpoint |
 | **Re-check windows and flip alerts** | Slice 3. 24h, 7d, 30d, 90d; dead-to-alive is logged as an alert |
 | **`ghostgrant report <agent>`** | Slice 4. JSON and plain-text report across every window |
@@ -78,8 +77,9 @@ npm install
 # 2. Build the CLI into dist/
 npm run build
 
-# 3. Run it
-node dist/cli.js --help
+# 3. Record the example manifest (format: docs/manifest.md) and check it in mock mode
+node dist/cli.js decommission examples/manifest.yaml
+node dist/cli.js check --mock
 
 # 4. Tests and lint
 npm test && npm run lint
@@ -91,6 +91,7 @@ npm test && npm run lint
 |:---|:---|
 | [**📚 docs/**](docs/README.md) | The roadmap, the changelog, and the product spec and build plan. |
 | [**🧰 src/**](src/README.md) | The CLI source. |
+| [**📝 examples/**](examples/manifest.yaml) | A sample manifest for a fictional agent, used in the quick start. |
 | [**🧪 test/**](test/cli.test.ts) | Tests for `node --test`, run straight from TypeScript. |
 | [**🤖 CLAUDE.md**](CLAUDE.md) | Standing orders for the agent that works the roadmap each week. |
 

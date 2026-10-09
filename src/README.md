@@ -1,7 +1,7 @@
 <h1 align="center">🧰 Source</h1>
 
 <p align="center">
-  <em>The GhostGrant CLI. Right now it parses arguments and not much else.</em>
+  <em>The GhostGrant CLI. It records manifests and checks them against canned responses.</em>
 </p>
 
 <p align="center">
@@ -14,7 +14,9 @@
 | File | What it does |
 |:---|:---|
 | [**cli.ts**](cli.ts) | The `ghostgrant` bin entry. Hands `argv` to `run()` and sets the exit code. |
-| [**run.ts**](run.ts) | Command dispatch. Takes an `io` pair instead of writing to `process` directly, so tests can call it. |
+| [**run.ts**](run.ts) | Command dispatch and the `decommission` and `check --mock` commands. Takes a context (output, records directory, clock, canned mock responses) instead of reaching for `process`, so tests can call it. |
+| [**manifest.ts**](manifest.ts) | Parses and validates a manifest, and refuses anything shaped like a raw secret without echoing it. |
+| [**records.ts**](records.ts) | Writes and loads decommission records under `$GHOSTGRANT_HOME/records/`. |
 
 Tests live in [`../test/`](../test/cli.test.ts) and import these files directly. Node strips
 the types at runtime, so there's no build step before `npm test`.

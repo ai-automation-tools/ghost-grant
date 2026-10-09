@@ -15,6 +15,9 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 
 ## Unreleased
 
+**Added**
+- `ghostgrant decommission <manifest.yaml>` validates a manifest, refuses anything shaped like a raw secret without echoing it, and writes a record with a timestamp and the manifest's SHA-256. `ghostgrant check --mock` prints canned alive/dead for every recorded credential. Manifest format in `docs/manifest.md`. New runtime dependency: `yaml`. *Build*
+
 ## 2026-10-04
 
 **Added**

@@ -1,0 +1,11 @@
+# A fictional agent. Prefixes and hashes are fake.
+agent: billing-bot
+credentials:
+  - provider: github
+    type: personal-access-token
+    prefix: ghp_FAKE
+    hash: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  - provider: slack
+    type: bot-token
+    prefix: xoxb-FAKE
+    hash: sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
