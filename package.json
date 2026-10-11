@@ -25,5 +25,8 @@
     "eslint": "^9.39.5",
     "typescript": "~6.0",
     "typescript-eslint": "^8.70.1"
+  },
+  "dependencies": {
+    "yaml": "^2.9.1"
   }
 }
