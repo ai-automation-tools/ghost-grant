@@ -16,7 +16,8 @@ One item per weekly run. Take the first open box from the top. Every item above
 when all of them read `- [x]`.
 
 Markers: `- [ ]` open · `- [-]` claimed by a run in progress · `- [x]` done ·
-`- [!]` blocked, reason on the line · `🔒 Needs Mike` only Mike can do it.
+`- [!]` blocked, reason on the line · `🔒 Needs Mike` only Mike can do it ·
+`small` docs or config a run can batch, up to four per PR (untagged = a feature, one per run).
 
 The slices come from [product/build-plan.md](product/build-plan.md). The Okta and Google
 Workspace adapters (Slices 6 and 7) sit below the release line because the build plan's
@@ -35,12 +36,12 @@ is verified against mocked HTTP responses. No item needs a live credential.
 
 ## 🚦 Public release
 
-- [ ] **CI.** `.github/workflows/ci.yml` runs `npm ci`, `npm run lint`, `npm test` and `npm run build` on push to `main` and on every PR, with an explicit `permissions: contents: read` block, and the latest run on `main` is green.
-- [ ] **README usage matches the code.** Every command, flag, and manifest field in the README was run against the real build and behaves as written. The README states the spec's Won't list plainly, so nobody files an issue asking for revoke buttons or signed reports.
-- [ ] **Security.** `SECURITY.md` says how to report a vulnerability. A full-history secret scan (`gitleaks detect --log-opts="--all"` or equivalent) comes back clean, and the command and result are recorded in the PR that ticks this box. Test fixtures that look like tokens are obviously fake and documented as such.
+- [ ] `small` **CI.** `.github/workflows/ci.yml` runs `npm ci`, `npm run lint`, `npm test` and `npm run build` on push to `main` and on every PR, with an explicit `permissions: contents: read` block, and the latest run on `main` is green.
+- [ ] `small` **README usage matches the code.** Every command, flag, and manifest field in the README was run against the real build and behaves as written. The README states the spec's Won't list plainly, so nobody files an issue asking for revoke buttons or signed reports.
+- [ ] `small` **Security.** `SECURITY.md` says how to report a vulnerability. A full-history secret scan (`gitleaks detect --log-opts="--all"` or equivalent) comes back clean, and the command and result are recorded in the PR that ticks this box. Test fixtures that look like tokens are obviously fake and documented as such.
 - [ ] **Live demo at `https://ai-automation-tools.dev/ghost-grant/`.** Served by GitHub Pages from this repo through an `actions/deploy-pages` workflow publishing the built `site/`. A visitor sees the mock decommission report with nothing to install. The org source bar sits across the very top, its note saying this is a demo with made-up credentials and its View source link pointing at `https://github.com/ai-automation-tools/ghost-grant`.
-- [ ] **Demo is safe to publish.** Every agent name, account, key prefix and hash in the demo is fabricated. No real personal data, no local paths, and no network request other than the page loading its own files.
-- [ ] **README hero points at the demo.** The Live Demo badge and nav links resolve to the Pages URL above the fold.
+- [ ] `small` **Demo is safe to publish.** Every agent name, account, key prefix and hash in the demo is fabricated. No real personal data, no local paths, and no network request other than the page loading its own files.
+- [ ] `small` **README hero points at the demo.** The Live Demo badge and nav links resolve to the Pages URL above the fold.
 
 ## After public release
 
