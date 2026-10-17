@@ -35,7 +35,7 @@ credentials:
 | `credentials` | yes | A list with at least one entry. |
 | `credentials[].provider` | yes | One of `github`, `slack`, `aws`, `okta`, `google-workspace`. |
 | `credentials[].type` | yes | What kind of credential it was, in your words (`personal-access-token`, `bot-token`, `access-key`). |
-| `credentials[].prefix` | yes | The visible start of the credential, 12 characters at most, so a person can tell which one it was. |
+| `credentials[].prefix` | yes | The visible start of the credential, 12 characters at most, so a person can tell which one it was. `check --live` also uses it to pair each token you pipe in with its credential, so make it long enough to tell your credentials apart. |
 | `credentials[].hash` | yes | `sha256:` followed by 64 lowercase hex digits: a salted SHA-256 of the secret that you compute yourself. GhostGrant checks only the format. |
 
 ## What gets rejected
