@@ -33,9 +33,9 @@
 ---
 
 > [!WARNING]
-> **No provider gets called yet.** `decommission` records a manifest and `check --mock`
-> answers every credential from canned responses. The GitHub, Slack and AWS adapters come
-> next. See the [roadmap](docs/ROADMAP.md).
+> **Only GitHub is wired up so far.** `check --live` asks GitHub; Slack and AWS answer
+> `unknown` until their adapters land, and there are no re-check windows or reports yet.
+> See the [roadmap](docs/ROADMAP.md).
 
 ## 💡 What it's for
 
@@ -58,7 +58,8 @@ It is a local CLI. There's no GhostGrant server, no account, and no telemetry.
 |:---|:---|
 | **`ghostgrant decommission <manifest>`** | ✅ Records a decommission entry with a timestamp and the manifest's checksum. [Manifest format](docs/manifest.md) |
 | **`ghostgrant check --mock`** | ✅ Answers every recorded credential from canned responses and prints alive/dead |
-| **GitHub and Slack adapters** | Slices 1 and 2. Alive/dead from the provider's own endpoint |
+| **`ghostgrant check --live`** | ✅ GitHub: asks `GET /user` with each token you pipe in. 200 is alive, 401 is dead, a timeout, 5xx or rate limit is unknown. [Live checks](#-live-checks) |
+| **Slack adapter** | Slice 2. Alive/dead from `auth.test` |
 | **Re-check windows and flip alerts** | Slice 3. 24h, 7d, 30d, 90d; dead-to-alive is logged as an alert |
 | **`ghostgrant report <agent>`** | Slice 4. JSON and plain-text report across every window |
 | **AWS IAM, Okta, Google Workspace** | Slices 5 to 7 |
@@ -84,6 +85,20 @@ node dist/cli.js check --mock
 # 4. Tests and lint
 npm test && npm run lint
 ```
+
+## 🔑 Live checks
+
+`check --live` needs the tokens themselves, which the manifest never holds. Pipe them in on
+stdin, one per line. Each token goes to the credential whose `prefix` it starts with, is
+sent to that provider once, and is dropped when the run ends. Nothing prints or stores it.
+
+```bash
+printenv OLD_AGENT_GH_TOKEN | node dist/cli.js check --live
+```
+
+A credential with no matching token, or more than one, reports `unknown` and nobody is
+called. So does every provider that doesn't have an adapter yet. `unknown` never counts as
+dead.
 
 ## 🗂️ What's in here
 

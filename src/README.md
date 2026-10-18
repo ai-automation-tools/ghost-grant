@@ -1,7 +1,7 @@
 <h1 align="center">🧰 Source</h1>
 
 <p align="center">
-  <em>The GhostGrant CLI. It records manifests and checks them against canned responses.</em>
+  <em>The GhostGrant CLI. It records manifests and checks them against canned responses or GitHub itself.</em>
 </p>
 
 <p align="center">
@@ -14,7 +14,8 @@
 | File | What it does |
 |:---|:---|
 | [**cli.ts**](cli.ts) | The `ghostgrant` bin entry. Hands `argv` to `run()` and sets the exit code. |
-| [**run.ts**](run.ts) | Command dispatch and the `decommission` and `check --mock` commands. Takes a context (output, records directory, clock, canned mock responses) instead of reaching for `process`, so tests can call it. |
+| [**run.ts**](run.ts) | Command dispatch and the `decommission` and `check` commands. Takes a context (output, records directory, clock, canned mock responses, `fetch`, and the stdin token reader for `--live`) instead of reaching for `process`, so tests can call it. |
+| [**adapters.ts**](adapters.ts) | One read-only check per provider: token in, `alive`, `dead` or `unknown` out. GitHub so far (`GET /user`). |
 | [**manifest.ts**](manifest.ts) | Parses and validates a manifest, and refuses anything shaped like a raw secret without echoing it. |
 | [**records.ts**](records.ts) | Writes and loads decommission records under `$GHOSTGRANT_HOME/records/`. |
 
