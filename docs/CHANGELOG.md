@@ -20,6 +20,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 - `ghostgrant decommission <manifest.yaml>` validates a manifest, refuses anything shaped like a raw secret without echoing it, and writes a record with a timestamp and the manifest's SHA-256. `ghostgrant check --mock` prints canned alive/dead for every recorded credential. Manifest format in `docs/manifest.md`. New runtime dependency: `yaml`. *Build*
 
 **Docs**
+- 2026-10-19: release scope cut to the MVP (pipeline change, Mike). The Slack and AWS IAM adapters (Slices 2 and 5) moved below `## After public release`, so the first release covers GitHub end to end; the demo-safety and README-hero items folded into the live-demo item; the routine now runs Tue/Thu/Sat and batches up to six `small` items. No item dropped.
 - 2026-10-19: the roadmap moved onto the lab's roadmap standard: `now` and `stage` badges, an intro naming the Ghost-Grant Weekly Roadmap routine, the Build section split into one heading per build-plan slice (Slices 0 and 1 marked done), done notes moved to the end of each item (`— done YYYY-MM-DD: …`), and Monetize renamed Revenue. No items added or dropped, and every state is unchanged.
 
 ## 2026-10-04
