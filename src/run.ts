@@ -6,7 +6,16 @@ import { join } from "node:path";
 import { text } from "node:stream/consumers";
 import { ADAPTERS, type Status } from "./adapters.ts";
 import { type Credential, looksLikeSecret, ManifestError, parseManifest } from "./manifest.ts";
-import { loadRecords, writeRecord } from "./records.ts";
+import {
+  appendAlert,
+  type CheckResult,
+  type DecommissionRecord,
+  dueWindow,
+  loadRecords,
+  saveRecord,
+  WINDOWS,
+  writeRecord,
+} from "./records.ts";
 
 const { version } = createRequire(import.meta.url)("../package.json") as { version: string };
 
@@ -14,12 +23,15 @@ const HELP = `ghostgrant ${version}
 
 Usage:
   ghostgrant decommission <manifest.yaml>   Record a retired agent's credentials to verify
-  ghostgrant check --mock                   Check every recorded credential against canned responses
-  ghostgrant check --live                   Ask each provider, using tokens read from stdin (one per line)
+  ghostgrant check --mock                   Run every check that's due against canned responses
+  ghostgrant check --live                   Run every check that's due, asking each provider with
+                                            tokens read from stdin (one per line)
   ghostgrant report <agent-name>            Print the status of every check for one agent
   ghostgrant --version                      Print the version
   ghostgrant --help                         Print this help
 
+Checks fall due at decommission, then 24h, 7d, 30d and 90d after it. A credential that
+goes from dead to alive is printed as an ALERT and logged to $GHOSTGRANT_HOME/alerts.log.
 Records are kept in $GHOSTGRANT_HOME (default ~/.ghostgrant).
 `;
 
@@ -88,13 +100,46 @@ function decommission(path: string | undefined, ctx: Context): number {
 
 // The token for a credential is the one supplied token that starts with its prefix. No
 // match, or more than one, leaves the credential unchecked rather than guessing.
-async function liveStatus(c: Credential, tokens: string[], ctx: Context): Promise<string> {
+async function liveStatus(c: Credential, tokens: string[], ctx: Context): Promise<[Status, string?]> {
   const adapter = ADAPTERS[c.provider];
-  if (!adapter) return "unknown (no live adapter for this provider yet)";
+  if (!adapter) return ["unknown", "no live adapter for this provider yet"];
   const matches = tokens.filter((t) => t.startsWith(c.prefix));
-  if (matches.length === 0) return "unknown (no token on stdin matches this prefix)";
-  if (matches.length > 1) return "unknown (more than one token on stdin matches this prefix)";
-  return adapter(matches[0], ctx.fetch);
+  if (matches.length === 0) return ["unknown", "no token on stdin matches this prefix"];
+  if (matches.length > 1) return ["unknown", "more than one token on stdin matches this prefix"];
+  return [await adapter(matches[0], ctx.fetch)];
+}
+
+// Checks every credential the record's latest due window hasn't settled yet. A settled
+// credential has an alive or dead answer for that window; unknown gets asked again next run.
+async function checkRecord(r: DecommissionRecord, source: CheckResult["source"], tokens: string[], ctx: Context) {
+  const now = ctx.now();
+  const window = dueWindow(r, now);
+  const history = (r.checks ?? []).filter((c) => c.source === source);
+  const settled = (hash: string) =>
+    history.some((c) => c.window === window && c.hash === hash && c.status !== "unknown");
+  const todo = window ? r.credentials.filter((c) => !settled(c.hash)) : [];
+  if (!window || todo.length === 0) {
+    const age = now.getTime() - Date.parse(r.decommissionedAt);
+    const next = WINDOWS.find(([, offset]) => offset > age);
+    const when = new Date(Date.parse(r.decommissionedAt) + (next?.[1] ?? 0)).toISOString();
+    ctx.out(`\n${r.agent}: nothing due. ${next ? `Next check (${next[0]}) at ${when}.` : "Every window has been checked."}\n`);
+    return;
+  }
+  ctx.out(`\n${r.agent} (decommissioned ${r.decommissionedAt}), ${window} check\n`);
+  const checks = [...(r.checks ?? [])];
+  for (const c of todo) {
+    const [status, note] = source === "live" ? await liveStatus(c, tokens, ctx) : [ctx.mockResponses[c.hash] ?? "dead"];
+    const at = now.toISOString();
+    ctx.out(`  ${c.provider.padEnd(16)} ${c.type.padEnd(24)} ${c.prefix.padEnd(12)} ${status}${note ? ` (${note})` : ""}\n`);
+    // A flip is alive now after the last definite answer was dead; unknowns in between don't count.
+    const last = history.findLast((h) => h.hash === c.hash && h.status !== "unknown");
+    if (last?.status === "dead" && status === "alive") {
+      appendAlert(ctx.home, { at, agent: r.agent, window, source, provider: c.provider, type: c.type, prefix: c.prefix });
+      ctx.out(`  ALERT: ${c.provider} ${c.type} ${c.prefix} was dead at the ${last.window} check and is alive again.\n`);
+    }
+    checks.push({ window, checkedAt: at, source, hash: c.hash, status });
+  }
+  saveRecord(ctx.home, { ...r, checks });
 }
 
 async function check(flags: string[], ctx: Context): Promise<number> {
@@ -111,13 +156,7 @@ async function check(flags: string[], ctx: Context): Promise<number> {
   }
   const tokens = live ? await ctx.readSecrets() : [];
   ctx.out(live ? "Live mode: asking each provider. Tokens are not stored.\n" : "Mock mode: canned responses, no provider was called.\n");
-  for (const r of records) {
-    ctx.out(`\n${r.agent} (decommissioned ${r.decommissionedAt})\n`);
-    for (const c of r.credentials) {
-      const status = live ? await liveStatus(c, tokens, ctx) : (ctx.mockResponses[c.hash] ?? "dead");
-      ctx.out(`  ${c.provider.padEnd(16)} ${c.type.padEnd(24)} ${c.prefix.padEnd(12)} ${status}\n`);
-    }
-  }
+  for (const r of records) await checkRecord(r, live ? "live" : "mock", tokens, ctx);
   return 0;
 }
 

@@ -59,6 +59,12 @@ Each manifest becomes `records/<agent>.json` under `$GHOSTGRANT_HOME` (default
 manifest file's bytes, and the credential entries as written. Decommissioning the same agent
 twice is refused rather than overwriting the first record.
 
+Each `ghostgrant check` appends its answers to the record's `checks` list: the window
+(`initial`, `24h`, `7d`, `30d` or `90d`), the time, whether it was `mock` or `live`, the
+credential's hash and its status. Flip alerts go to `$GHOSTGRANT_HOME/alerts.log`, one JSON
+object per line, naming the credential by provider, type and prefix. No token is ever
+written to either.
+
 ---
 
 <p align="center">
