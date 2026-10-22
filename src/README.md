@@ -19,7 +19,7 @@
 | [**manifest.ts**](manifest.ts) | Parses and validates a manifest, and refuses anything shaped like a raw secret without echoing it. |
 | [**records.ts**](records.ts) | The re-check windows, and reading and writing decommission records (with their check results) and the alert log under `$GHOSTGRANT_HOME`. |
 
-Tests live in [`../test/`](../test/cli.test.ts) and import these files directly. Node strips
+Tests live in [`../tests/`](../tests/cli.test.ts) and import these files directly. Node strips
 the types at runtime, so there's no build step before `npm test`.
 
 ---

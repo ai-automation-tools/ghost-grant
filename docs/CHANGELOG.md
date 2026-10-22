@@ -20,6 +20,9 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 - GitHub adapter. `ghostgrant check --live` reads tokens from stdin, pairs each with a recorded credential by prefix, and asks GitHub's `GET /user`: 200 is alive, 401 is dead, and a timeout, 5xx or rate limit is unknown. Tokens are never printed or stored. `check` now needs `--mock` or `--live`. *Build*
 - `ghostgrant decommission <manifest.yaml>` validates a manifest, refuses anything shaped like a raw secret without echoing it, and writes a record with a timestamp and the manifest's SHA-256. `ghostgrant check --mock` prints canned alive/dead for every recorded credential. Manifest format in `docs/manifest.md`. New runtime dependency: `yaml`. *Build*
 
+**Changed**
+- Moved to the org folder layout: the agent instructions are in `AGENTS.md` now (Codex, Gemini CLI and opencode read it), and `CLAUDE.md` is a bare `@AGENTS.md` import for Claude Code. The test folder is `tests/` instead of `test/`, with every path that named it updated.
+
 **Docs**
 - 2026-10-19: release scope cut to the MVP (pipeline change, Mike). The Slack and AWS IAM adapters (Slices 2 and 5) moved below `## After public release`, so the first release covers GitHub end to end; the demo-safety and README-hero items folded into the live-demo item; the routine now runs Tue/Thu/Sat and batches up to six `small` items. No item dropped.
 - 2026-10-19: the roadmap moved onto the lab's roadmap standard: `now` and `stage` badges, an intro naming the Ghost-Grant Weekly Roadmap routine, the Build section split into one heading per build-plan slice (Slices 0 and 1 marked done), done notes moved to the end of each item (`— done YYYY-MM-DD: …`), and Monetize renamed Revenue. No items added or dropped, and every state is unchanged.
