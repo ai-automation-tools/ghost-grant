@@ -1,6 +1,6 @@
 # Build plan: GhostGrant open-source CLI core
 
-> Copied from the GhostGrant business plan (`Business-Plans/ghost-grant/build/build-plan.md` in the private pipeline workspace) on 2026-10-04. The ADR and estimate it cites stay in the private plan; `CLAUDE.md` summarizes the ADR.
+> Copied from the GhostGrant business plan (`Business-Plans/ghost-grant/build/build-plan.md` in the private pipeline workspace) on 2026-10-04. The ADR and estimate it cites stay in the private plan; `AGENTS.md` summarizes the ADR.
 
 **Spec:** [spec.md](spec.md) · **Architecture:** ADR-001, TypeScript on Node.js (private) · **Estimate:** private
 

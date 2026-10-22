@@ -50,7 +50,7 @@
 
 ## Open questions
 
-- Language/runtime choice (Python vs. Node vs. Go) — resolved by ADR-001 (private): TypeScript on Node.js. `CLAUDE.md` summarizes it.
+- Language/runtime choice (Python vs. Node vs. Go) — resolved by ADR-001 (private): TypeScript on Node.js. `AGENTS.md` summarizes it.
 - Exact manifest schema (YAML shape) — first implementation detail, not a blocking open question; the walking skeleton in `build-plan.md` fixes it.
 - Whether GitHub's 2026-03-26 Credential Revocation API changelog (noted in the plan's private research) gives GhostGrant's GitHub adapter a cleaner introspection path than a generic `/user` whoami call — worth 30 minutes of docs-reading before Slice 1 starts.
 

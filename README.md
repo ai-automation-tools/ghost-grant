@@ -119,8 +119,8 @@ apart, so a canned answer never counts as a real check.
 | [**📚 docs/**](docs/README.md) | The roadmap, the changelog, and the product spec and build plan. |
 | [**🧰 src/**](src/README.md) | The CLI source. |
 | [**📝 examples/**](examples/manifest.yaml) | A sample manifest for a fictional agent, used in the quick start. |
-| [**🧪 test/**](test/cli.test.ts) | Tests for `node --test`, run straight from TypeScript. |
-| [**🤖 CLAUDE.md**](CLAUDE.md) | Standing orders for the agent that works the roadmap each week. |
+| [**🧪 tests/**](tests/cli.test.ts) | Tests for `node --test`, run straight from TypeScript. |
+| [**🤖 AGENTS.md**](AGENTS.md) | Standing orders for the agent that works the roadmap each week. `CLAUDE.md` imports it for Claude Code. |
 
 ## 🔗 Related repositories
 
