@@ -16,6 +16,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 ## Unreleased
 
 **Added**
+- Re-check windows and flip alerts. `ghostgrant check` runs each record's due window (at decommission, then 24h, 7d, 30d and 90d), skips records with nothing due and says when the next check is, and asks again about any `unknown` answer. A credential that goes from dead to alive prints an `ALERT` and is appended to `$GHOSTGRANT_HOME/alerts.log`. Results are stored on the record, mock and live kept apart. *Build*
 - GitHub adapter. `ghostgrant check --live` reads tokens from stdin, pairs each with a recorded credential by prefix, and asks GitHub's `GET /user`: 200 is alive, 401 is dead, and a timeout, 5xx or rate limit is unknown. Tokens are never printed or stored. `check` now needs `--mock` or `--live`. *Build*
 - `ghostgrant decommission <manifest.yaml>` validates a manifest, refuses anything shaped like a raw secret without echoing it, and writes a record with a timestamp and the manifest's SHA-256. `ghostgrant check --mock` prints canned alive/dead for every recorded credential. Manifest format in `docs/manifest.md`. New runtime dependency: `yaml`. *Build*
 

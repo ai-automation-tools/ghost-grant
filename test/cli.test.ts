@@ -214,3 +214,101 @@ test("check --live without a matching token reports unknown and calls nobody", a
     assert.match(r.out, /github .*ghp_FAKE\s+unknown \((no|more than one) token/);
   }
 });
+
+const HOUR = 3600_000;
+const at = (hours: number) => () => new Date(NOW.getTime() + hours * HOUR);
+const record = (home: string) => JSON.parse(readFileSync(join(home, "records", "billing-bot.json"), "utf8"));
+const alerts = (home: string) =>
+  existsSync(join(home, "alerts.log")) ? readFileSync(join(home, "alerts.log"), "utf8").split("\n").filter(Boolean) : [];
+
+test("check re-checks a record once its 24h window has passed", async () => {
+  const s = sandbox();
+  await s.exec(["decommission", s.write("m.yaml", VALID)]);
+  assert.match((await s.exec(["check", "--mock"])).out, /billing-bot .*initial check\n/);
+  const r = await s.exec(["check", "--mock"], { now: at(25) });
+  assert.equal(r.code, 0, r.err);
+  assert.match(r.out, /billing-bot .*24h check\n/);
+  assert.match(r.out, /github .*ghp_FAKE\s+dead\n/);
+  const checks = record(s.home).checks;
+  assert.deepEqual(checks.map((c: { window: string }) => c.window), ["initial", "initial", "24h", "24h"]);
+  assert.equal(checks[2].checkedAt, at(25)().toISOString());
+  assert.equal(checks[2].source, "mock");
+});
+
+test("check skips a record whose next window isn't due", async () => {
+  const s = sandbox();
+  await s.exec(["decommission", s.write("m.yaml", VALID)]);
+  await s.exec(["check", "--mock"]);
+  const before = record(s.home);
+  const r = await s.exec(["check", "--mock"], { now: at(23) });
+  assert.equal(r.code, 0, r.err);
+  assert.match(r.out, /billing-bot: nothing due\. Next check \(24h\) at 2026-10-09T12:00:00\.000Z\./);
+  assert.doesNotMatch(r.out, /github/);
+  assert.deepEqual(record(s.home), before);
+});
+
+test("a missed window is skipped for the latest one that's due", async () => {
+  const s = sandbox();
+  await s.exec(["decommission", s.write("m.yaml", VALID)]);
+  const r = await s.exec(["check", "--mock"], { now: at(8 * 24) });
+  assert.match(r.out, /7d check\n/);
+  assert.deepEqual(new Set(record(s.home).checks.map((c: { window: string }) => c.window)), new Set(["7d"]));
+});
+
+test("a dead credential that comes back alive raises exactly one alert", async () => {
+  const s = sandbox();
+  await s.exec(["decommission", s.write("m.yaml", VALID)]);
+  assert.doesNotMatch((await s.exec(["check", "--mock"])).out, /ALERT/);
+  const flipped = await s.exec(["check", "--mock"], { now: at(25), mockResponses: { [HASH_A]: "alive" } });
+  assert.match(flipped.out, /ALERT: github personal-access-token ghp_FAKE was dead at the initial check and is alive again\./);
+  // Still alive a week later: no new flip, so no new alert.
+  const still = await s.exec(["check", "--mock"], { now: at(7 * 24), mockResponses: { [HASH_A]: "alive" } });
+  assert.doesNotMatch(still.out, /ALERT/);
+  const log = alerts(s.home);
+  assert.equal(log.length, 1);
+  assert.deepEqual(JSON.parse(log[0]), {
+    at: at(25)().toISOString(),
+    agent: "billing-bot",
+    window: "24h",
+    source: "mock",
+    provider: "github",
+    type: "personal-access-token",
+    prefix: "ghp_FAKE",
+  });
+  assert.ok(!log[0].includes(HASH_A), "hashes stay out of the alert log");
+});
+
+test("an unknown answer is asked again in the same window, and doesn't hide a flip", async () => {
+  const s = sandbox();
+  await s.exec(["decommission", s.write("m.yaml", VALID)]);
+  await s.exec(["check", "--mock"]); // both dead
+  const unknown = await s.exec(["check", "--mock"], { now: at(25), mockResponses: { [HASH_A]: "unknown" } });
+  assert.match(unknown.out, /github .*ghp_FAKE\s+unknown\n/);
+  const retry = await s.exec(["check", "--mock"], { now: at(26), mockResponses: { [HASH_A]: "alive" } });
+  assert.match(retry.out, /24h check\n/);
+  assert.match(retry.out, /github .*ghp_FAKE\s+alive\n/);
+  assert.doesNotMatch(retry.out, /slack/, "slack was settled at 24h and isn't asked again");
+  assert.match(retry.out, /ALERT: github .*dead at the initial check/);
+  assert.equal(alerts(s.home).length, 1);
+});
+
+test("live and mock answers keep separate histories", async () => {
+  const s = sandbox();
+  await s.exec(["decommission", s.write("m.yaml", VALID)]);
+  await s.exec(["check", "--mock"]);
+  const r = await s.exec(["check", "--live"], {
+    readSecrets: async () => [LIVE_TOKEN],
+    fetch: async () => new Response("{}", { status: 200 }),
+  });
+  assert.match(r.out, /initial check\n/);
+  assert.doesNotMatch(r.out, /ALERT/, "a canned dead answer can't set up a live flip");
+  assert.ok(!readFileSync(join(s.home, "records", "billing-bot.json"), "utf8").includes(LIVE_TOKEN));
+});
+
+test("after the 90d window every check is done", async () => {
+  const s = sandbox();
+  await s.exec(["decommission", s.write("m.yaml", VALID)]);
+  await s.exec(["check", "--mock"], { now: at(91 * 24) });
+  const r = await s.exec(["check", "--mock"], { now: at(200 * 24) });
+  assert.match(r.out, /billing-bot: nothing due\. Every window has been checked\./);
+});

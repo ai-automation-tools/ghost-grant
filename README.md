@@ -34,7 +34,7 @@
 
 > [!WARNING]
 > **Only GitHub is wired up so far.** `check --live` asks GitHub; Slack and AWS answer
-> `unknown` until their adapters land, and there are no re-check windows or reports yet.
+> `unknown` until their adapters land, and there's no `report` command yet.
 > See the [roadmap](docs/ROADMAP.md).
 
 ## 💡 What it's for
@@ -57,10 +57,10 @@ It is a local CLI. There's no GhostGrant server, no account, and no telemetry.
 | Feature | Status |
 |:---|:---|
 | **`ghostgrant decommission <manifest>`** | ✅ Records a decommission entry with a timestamp and the manifest's checksum. [Manifest format](docs/manifest.md) |
-| **`ghostgrant check --mock`** | ✅ Answers every recorded credential from canned responses and prints alive/dead |
+| **`ghostgrant check --mock`** | ✅ Runs every check that's due against canned responses and prints alive/dead |
 | **`ghostgrant check --live`** | ✅ GitHub: asks `GET /user` with each token you pipe in. 200 is alive, 401 is dead, a timeout, 5xx or rate limit is unknown. [Live checks](#-live-checks) |
 | **Slack adapter** | Slice 2. Alive/dead from `auth.test` |
-| **Re-check windows and flip alerts** | Slice 3. 24h, 7d, 30d, 90d; dead-to-alive is logged as an alert |
+| **Re-check windows and flip alerts** | ✅ Each `check` runs the window that's due (at decommission, then 24h, 7d, 30d, 90d) and skips records with nothing due. Dead-to-alive prints an `ALERT` and goes to `alerts.log`. |
 | **`ghostgrant report <agent>`** | Slice 4. JSON and plain-text report across every window |
 | **AWS IAM, Okta, Google Workspace** | Slices 5 to 7 |
 | **Static demo dashboard** | Slice 8. A mock report rendered in the browser |
@@ -99,6 +99,18 @@ printenv OLD_AGENT_GH_TOKEN | node dist/cli.js check --live
 A credential with no matching token, or more than one, reports `unknown` and nobody is
 called. So does every provider that doesn't have an adapter yet. `unknown` never counts as
 dead.
+
+## ⏱️ Re-checks and alerts
+
+Each credential gets checked at decommission, then 24 hours, 7 days, 30 days and 90 days
+after it. Run `ghostgrant check` as often as you like, by hand or from cron: it only asks
+about the window that's due and says when the next one is. If you miss a window, the next
+run checks the latest one that's due instead. An `unknown` answer doesn't settle a window,
+so the next run asks again.
+
+A credential whose last definite answer was dead and now answers alive prints an `ALERT`
+line and adds one JSON line to `$GHOSTGRANT_HOME/alerts.log`. Mock and live answers are kept
+apart, so a canned answer never counts as a real check.
 
 ## 🗂️ What's in here
 

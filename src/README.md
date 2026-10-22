@@ -14,10 +14,10 @@
 | File | What it does |
 |:---|:---|
 | [**cli.ts**](cli.ts) | The `ghostgrant` bin entry. Hands `argv` to `run()` and sets the exit code. |
-| [**run.ts**](run.ts) | Command dispatch and the `decommission` and `check` commands. Takes a context (output, records directory, clock, canned mock responses, `fetch`, and the stdin token reader for `--live`) instead of reaching for `process`, so tests can call it. |
+| [**run.ts**](run.ts) | Command dispatch and the `decommission` and `check` commands, including which credentials are due and flip detection. Takes a context (output, records directory, clock, canned mock responses, `fetch`, and the stdin token reader for `--live`) instead of reaching for `process`, so tests can call it. |
 | [**adapters.ts**](adapters.ts) | One read-only check per provider: token in, `alive`, `dead` or `unknown` out. GitHub so far (`GET /user`). |
 | [**manifest.ts**](manifest.ts) | Parses and validates a manifest, and refuses anything shaped like a raw secret without echoing it. |
-| [**records.ts**](records.ts) | Writes and loads decommission records under `$GHOSTGRANT_HOME/records/`. |
+| [**records.ts**](records.ts) | The re-check windows, and reading and writing decommission records (with their check results) and the alert log under `$GHOSTGRANT_HOME`. |
 
 Tests live in [`../test/`](../test/cli.test.ts) and import these files directly. Node strips
 the types at runtime, so there's no build step before `npm test`.
