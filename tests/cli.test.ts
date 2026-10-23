@@ -5,6 +5,7 @@ import { existsSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } fro
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { run, type Context } from "../src/run.ts";
+import type { Report } from "../src/report.ts";
 
 const NOW = new Date("2026-10-08T12:00:00.000Z");
 // Obviously fake hashes. GhostGrant only checks their format.
@@ -60,12 +61,6 @@ test("no arguments prints help", async () => {
   const r = await sandbox().exec([]);
   assert.equal(r.code, 0);
   assert.match(r.out, /Usage:/);
-});
-
-test("report says it isn't built yet", async () => {
-  const r = await sandbox().exec(["report", "billing-bot"]);
-  assert.equal(r.code, 1);
-  assert.match(r.err, /not built yet/);
 });
 
 test("an unknown command fails with help on stderr", async () => {
@@ -311,4 +306,83 @@ test("after the 90d window every check is done", async () => {
   await s.exec(["check", "--mock"], { now: at(91 * 24) });
   const r = await s.exec(["check", "--mock"], { now: at(200 * 24) });
   assert.match(r.out, /billing-bot: nothing due\. Every window has been checked\./);
+});
+
+// Checks at every window, so a report can cover the full 90 days.
+async function checkEveryWindow(s: ReturnType<typeof sandbox>, mockAt: (day: number) => Context["mockResponses"] = () => ({})) {
+  for (const day of [0, 1, 7, 30, 90]) await s.exec(["check", "--mock"], { now: at(day * 24), mockResponses: mockAt(day) });
+}
+const NO_CLAIMS = /attest|complian|certif|audit|guarantee/i;
+
+test("report --mock on an all-clean record says every credential answered dead through 90d", async () => {
+  const s = sandbox();
+  await s.exec(["decommission", s.write("m.yaml", VALID)]);
+  await checkEveryWindow(s);
+  const r = await s.exec(["report", "billing-bot", "--mock"], { now: at(91 * 24) });
+  assert.equal(r.code, 0, r.err);
+  assert.match(r.out, /^GhostGrant report: billing-bot\nGenerated 2027-01-07T12:00:00\.000Z from mock checks/);
+  for (const w of ["initial", "24h", "7d", "30d", "90d"]) assert.match(r.out, new RegExp(` {2}${w} +\\S+ {2}dead\\n`));
+  assert.match(r.out, /Every credential answered dead at every window checked, through 90d\.\n$/);
+  assert.doesNotMatch(r.out, NO_CLAIMS);
+  assert.ok(!r.out.includes(HASH_A), "hashes stay out of the report");
+});
+
+test("report --json has the same data, with a flip marked where it happened", async () => {
+  const s = sandbox();
+  await s.exec(["decommission", s.write("m.yaml", VALID)]);
+  await checkEveryWindow(s, (day) => (day === 7 ? { [HASH_A]: "alive" } : {}));
+  const text = await s.exec(["report", "billing-bot", "--mock"], { now: at(91 * 24) });
+  assert.match(text.out, / {2}7d +\S+ {2}alive {2}FLIP: was dead, alive again\n/);
+  assert.match(text.out, /Not clean: a credential went from dead back to alive\.\n$/);
+  const r = await s.exec(["report", "billing-bot", "--mock", "--json"], { now: at(91 * 24) });
+  assert.equal(r.code, 0, r.err);
+  const report: Report = JSON.parse(r.out);
+  assert.equal(report.verdict, "flipped");
+  assert.equal(report.source, "mock");
+  assert.equal(report.next, undefined);
+  const gh = report.credentials[0];
+  assert.deepEqual(gh.checks.map((c) => `${c.window}:${c.status}:${c.flip}`), [
+    "initial:dead:false", "24h:dead:false", "7d:alive:true", "30d:dead:false", "90d:dead:false",
+  ]);
+  assert.ok(report.credentials[1].checks.every((c) => c.status === "dead" && !c.flip));
+  assert.ok(!r.out.includes(HASH_A) && !r.out.includes("hash"), "hashes stay out of the report");
+});
+
+test("report midway says dead so far and when the next check is", async () => {
+  const s = sandbox();
+  await s.exec(["decommission", s.write("m.yaml", VALID)]);
+  await s.exec(["check", "--mock"]);
+  const r = await s.exec(["report", "billing-bot", "--mock"], { now: at(2) });
+  assert.match(r.out, /answered dead so far\. Next check \(24h\) at 2026-10-09T12:00:00\.000Z\.\n$/);
+});
+
+test("an unknown answer keeps a report from being clean", async () => {
+  const s = sandbox();
+  await s.exec(["decommission", s.write("m.yaml", VALID)]);
+  await checkEveryWindow(s, (day) => (day === 30 ? { [HASH_B]: "unknown" } : {}));
+  const r = await s.exec(["report", "billing-bot", "--mock", "--json"], { now: at(91 * 24) });
+  assert.equal((JSON.parse(r.out) as Report).verdict, "unknown");
+});
+
+test("report defaults to live checks and keeps mock answers out of them", async () => {
+  const s = sandbox();
+  await s.exec(["decommission", s.write("m.yaml", VALID)]);
+  await checkEveryWindow(s);
+  const r = await s.exec(["report", "billing-bot"], { now: at(91 * 24) });
+  assert.equal(r.code, 0, r.err);
+  assert.match(r.out, /from live checks\n/);
+  assert.match(r.out, /not checked yet/);
+  assert.match(r.out, /No live checks yet\. .*report billing-bot --mock/);
+});
+
+test("report for an unknown agent fails and writes nothing", async () => {
+  const s = sandbox();
+  const r = await s.exec(["report", "ghost-bot"]);
+  assert.equal(r.code, 1);
+  assert.match(r.err, /No decommission record for ghost-bot\./);
+  assert.deepEqual(s.records(), []);
+  const secret = await s.exec(["report", LIVE_TOKEN]);
+  assert.equal(secret.code, 1);
+  assert.ok(!secret.err.includes(LIVE_TOKEN), "a pasted token was echoed");
+  assert.match((await s.exec(["report"])).err, /Usage: ghostgrant report/);
 });

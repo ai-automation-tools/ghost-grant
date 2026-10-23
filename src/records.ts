@@ -52,6 +52,13 @@ export function dueWindow(record: DecommissionRecord, now: Date): Window | undef
   return WINDOWS.findLast(([, offset]) => age >= offset)?.[0];
 }
 
+// The first window still to come and when it falls due, or undefined once 90d has passed.
+export function nextWindow(record: DecommissionRecord, now: Date): { window: Window; dueAt: string } | undefined {
+  const start = Date.parse(record.decommissionedAt);
+  const next = WINDOWS.find(([, offset]) => start + offset > now.getTime());
+  return next && { window: next[0], dueAt: new Date(start + next[1]).toISOString() };
+}
+
 // Refuses to overwrite: an existing record is history, not something to replace.
 export function writeRecord(home: string, record: DecommissionRecord): string {
   mkdirSync(dir(home), { recursive: true });

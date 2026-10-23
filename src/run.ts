@@ -12,10 +12,11 @@ import {
   type DecommissionRecord,
   dueWindow,
   loadRecords,
+  nextWindow,
   saveRecord,
-  WINDOWS,
   writeRecord,
 } from "./records.ts";
+import { buildReport, formatReport } from "./report.ts";
 
 const { version } = createRequire(import.meta.url)("../package.json") as { version: string };
 
@@ -26,7 +27,8 @@ Usage:
   ghostgrant check --mock                   Run every check that's due against canned responses
   ghostgrant check --live                   Run every check that's due, asking each provider with
                                             tokens read from stdin (one per line)
-  ghostgrant report <agent-name>            Print the status of every check for one agent
+  ghostgrant report <agent-name>            Print every live check for one agent and what it found
+                                            (--mock for the mock checks, --json for JSON)
   ghostgrant --version                      Print the version
   ghostgrant --help                         Print this help
 
@@ -119,10 +121,8 @@ async function checkRecord(r: DecommissionRecord, source: CheckResult["source"],
     history.some((c) => c.window === window && c.hash === hash && c.status !== "unknown");
   const todo = window ? r.credentials.filter((c) => !settled(c.hash)) : [];
   if (!window || todo.length === 0) {
-    const age = now.getTime() - Date.parse(r.decommissionedAt);
-    const next = WINDOWS.find(([, offset]) => offset > age);
-    const when = new Date(Date.parse(r.decommissionedAt) + (next?.[1] ?? 0)).toISOString();
-    ctx.out(`\n${r.agent}: nothing due. ${next ? `Next check (${next[0]}) at ${when}.` : "Every window has been checked."}\n`);
+    const next = nextWindow(r, now);
+    ctx.out(`\n${r.agent}: nothing due. ${next ? `Next check (${next.window}) at ${next.dueAt}.` : "Every window has been checked."}\n`);
     return;
   }
   ctx.out(`\n${r.agent} (decommissioned ${r.decommissionedAt}), ${window} check\n`);
@@ -160,6 +160,22 @@ async function check(flags: string[], ctx: Context): Promise<number> {
   return 0;
 }
 
+function report(args: string[], ctx: Context): number {
+  const agent = args.find((a) => !a.startsWith("--"));
+  if (!agent) {
+    ctx.err("Usage: ghostgrant report <agent-name> [--mock] [--json]\n");
+    return 1;
+  }
+  const record = loadRecords(ctx.home).find((r) => r.agent === agent);
+  if (!record) {
+    ctx.err(looksLikeSecret(agent) ? "No decommission record for that agent.\n" : `No decommission record for ${agent}.\n`);
+    return 1;
+  }
+  const r = buildReport(record, args.includes("--mock") ? "mock" : "live", ctx.now());
+  ctx.out(args.includes("--json") ? JSON.stringify(r, null, 2) + "\n" : formatReport(r));
+  return 0;
+}
+
 // Returns the process exit code. Kept free of process.exit so tests can call it.
 export async function run(argv: string[], ctx: Context = defaultContext): Promise<number> {
   const [cmd, ...rest] = argv;
@@ -173,10 +189,7 @@ export async function run(argv: string[], ctx: Context = defaultContext): Promis
   }
   if (cmd === "decommission") return decommission(rest[0], ctx);
   if (cmd === "check") return check(rest, ctx);
-  if (cmd === "report") {
-    ctx.err("ghostgrant report is not built yet. See docs/ROADMAP.md.\n");
-    return 1;
-  }
+  if (cmd === "report") return report(rest, ctx);
   ctx.err(`Unknown command: ${cmd}\n\n${HELP}`);
   return 1;
 }
