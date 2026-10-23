@@ -34,7 +34,7 @@
 
 > [!WARNING]
 > **Only GitHub is wired up so far.** `check --live` asks GitHub; Slack and AWS answer
-> `unknown` until their adapters land, and there's no `report` command yet.
+> `unknown` until their adapters land.
 > See the [roadmap](docs/ROADMAP.md).
 
 ## 💡 What it's for
@@ -61,7 +61,7 @@ It is a local CLI. There's no GhostGrant server, no account, and no telemetry.
 | **`ghostgrant check --live`** | ✅ GitHub: asks `GET /user` with each token you pipe in. 200 is alive, 401 is dead, a timeout, 5xx or rate limit is unknown. [Live checks](#-live-checks) |
 | **Slack adapter** | Slice 2. Alive/dead from `auth.test` |
 | **Re-check windows and flip alerts** | ✅ Each `check` runs the window that's due (at decommission, then 24h, 7d, 30d, 90d) and skips records with nothing due. Dead-to-alive prints an `ALERT` and goes to `alerts.log`. |
-| **`ghostgrant report <agent>`** | Slice 4. JSON and plain-text report across every window |
+| **`ghostgrant report <agent>`** | ✅ A dated plain-text report of every check for one agent and what it found, or the same data with `--json`. [Reports](#-reports) |
 | **AWS IAM, Okta, Google Workspace** | Slices 5 to 7 |
 | **Static demo dashboard** | Slice 8. A mock report rendered in the browser |
 
@@ -81,6 +81,7 @@ npm run build
 # 3. Record the example manifest (format: docs/manifest.md) and check it in mock mode
 node dist/cli.js decommission examples/manifest.yaml
 node dist/cli.js check --mock
+node dist/cli.js report billing-bot --mock
 
 # 4. Tests and lint
 npm test && npm run lint
@@ -111,6 +112,28 @@ so the next run asks again.
 A credential whose last definite answer was dead and now answers alive prints an `ALERT`
 line and adds one JSON line to `$GHOSTGRANT_HOME/alerts.log`. Mock and live answers are kept
 apart, so a canned answer never counts as a real check.
+
+## 📄 Reports
+
+`ghostgrant report <agent>` prints every live check for one agent: each credential, each
+window, when it was asked and what came back, with any dead-to-alive flip marked. Add
+`--mock` to report the mock checks instead (the two are never mixed), and `--json` for the
+same data as JSON. The JSON shape is the `Report` type in [`src/report.ts`](src/report.ts).
+
+The last line says what the checks add up to:
+
+| Verdict | Meaning |
+|:---|:---|
+| `clean` | Every credential answered dead at every window checked, through 90d |
+| `dead-so-far` | Every answer so far is dead; the line says when the next check is due |
+| `unknown` | A credential has no alive or dead answer for a window that was checked |
+| `alive` | A credential's latest answer is alive |
+| `flipped` | A credential went from dead back to alive |
+| `not-checked` | No checks of that kind yet |
+
+`unknown` never counts as dead, so it keeps a report from being `clean`. The report says
+what was checked and what each provider answered, nothing more: it isn't signed, and it
+isn't compliance evidence.
 
 ## 🗂️ What's in here
 

@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/now-slice_4:_report-F59E0B?style=for-the-badge" alt="Now: Slice 4, report">
+  <img src="https://img.shields.io/badge/now-slice_8:_demo-F59E0B?style=for-the-badge" alt="Now: Slice 8, demo">
   <img src="https://img.shields.io/badge/stage-incubating-2ea44f?style=for-the-badge" alt="Stage: incubating">
   <a href="README.md"><img src="https://img.shields.io/badge/↩-docs_home-6B7280?style=for-the-badge" alt="Back to docs"></a>
 </p>
@@ -43,9 +43,9 @@ is verified against mocked HTTP responses. No item needs a live credential.
 
 - [x] **Slice 3: re-check windows and flip alert.** A record carries 24h, 7d, 30d and 90d windows. `ghostgrant check` re-checks every credential whose next window has passed and updates its status. A credential that goes from dead to alive writes an alert to a local alert log and prints it. Tests drive the clock: a record past 24h gets re-checked, one that isn't due is skipped, and a mocked dead-then-alive credential produces exactly one alert. — done 2026-10-20 by ghost-grant-roadmap: results stored on the record per window, mock and live apart; `unknown` is re-asked; alerts in `$GHOSTGRANT_HOME/alerts.log`; 42 tests
 
-## 📄 Slice 4: Report generator
+## 📄 Slice 4: Report generator (done 2026-10-22)
 
-- [ ] **Slice 4: report.** `ghostgrant report <agent-name>` prints a dated plain-text report and, with `--json`, the same data as JSON whose shape is a single exported TypeScript type. It lists every credential's result at every window checked so far. It makes no attestation or compliance claim. Tests cover an all-clean record, one with a flip, and an unknown agent name.
+- [x] **Slice 4: report.** `ghostgrant report <agent-name>` prints a dated plain-text report and, with `--json`, the same data as JSON whose shape is a single exported TypeScript type. It lists every credential's result at every window checked so far. It makes no attestation or compliance claim. Tests cover an all-clean record, one with a flip, and an unknown agent name. — done 2026-10-22 by ghost-grant-roadmap: `Report` type in `src/report.ts`, live by default and `--mock` for mock checks, a one-line verdict where `unknown` is never clean, 47 tests
 
 ## 🖥️ Slice 8: Static demo dashboard
 
