@@ -36,7 +36,9 @@ Full spec: `docs/product/spec.md`. Slice order: `docs/product/build-plan.md`. Wo
   (including the clock and the fetch function) so tests can call them without a process,
   a network, or real time passing.
 - The demo page (Slice 8) lives in `site/` and imports the report type from `src/`, so the
-  page and the CLI share one definition of the report shape.
+  page and the CLI share one definition of the report shape. `npm run build` writes the
+  page to `_site/site/`; `site/demo-report.json` is `buildReport` run on
+  `site/demo-record.json`, and `tests/site.test.ts` fails if the two drift.
 
 ## Verify
 
