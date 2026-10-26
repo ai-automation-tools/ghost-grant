@@ -1,0 +1,127 @@
+{
+  "agent": "triage-bot",
+  "generatedAt": "2026-09-02T09:00:00.000Z",
+  "source": "mock",
+  "decommissionedAt": "2026-06-01T09:00:00.000Z",
+  "manifestSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "credentials": [
+    {
+      "provider": "github",
+      "type": "personal-access-token",
+      "prefix": "ghp_FAKE",
+      "checks": [
+        {
+          "window": "initial",
+          "checkedAt": "2026-06-01T09:00:05.000Z",
+          "status": "dead",
+          "flip": false
+        },
+        {
+          "window": "24h",
+          "checkedAt": "2026-06-02T09:10:00.000Z",
+          "status": "dead",
+          "flip": false
+        },
+        {
+          "window": "7d",
+          "checkedAt": "2026-06-08T09:30:00.000Z",
+          "status": "dead",
+          "flip": false
+        },
+        {
+          "window": "30d",
+          "checkedAt": "2026-07-01T09:05:00.000Z",
+          "status": "dead",
+          "flip": false
+        },
+        {
+          "window": "90d",
+          "checkedAt": "2026-08-30T09:00:00.000Z",
+          "status": "dead",
+          "flip": false
+        }
+      ]
+    },
+    {
+      "provider": "github",
+      "type": "fine-grained-token",
+      "prefix": "github_pat_FAKE",
+      "checks": [
+        {
+          "window": "initial",
+          "checkedAt": "2026-06-01T09:00:05.000Z",
+          "status": "dead",
+          "flip": false
+        },
+        {
+          "window": "24h",
+          "checkedAt": "2026-06-02T09:10:00.000Z",
+          "status": "dead",
+          "flip": false
+        },
+        {
+          "window": "7d",
+          "checkedAt": "2026-06-08T09:30:00.000Z",
+          "status": "dead",
+          "flip": false
+        },
+        {
+          "window": "30d",
+          "checkedAt": "2026-07-01T09:05:00.000Z",
+          "status": "alive",
+          "flip": true
+        },
+        {
+          "window": "90d",
+          "checkedAt": "2026-08-30T09:00:00.000Z",
+          "status": "dead",
+          "flip": false
+        }
+      ]
+    },
+    {
+      "provider": "github",
+      "type": "oauth-token",
+      "prefix": "gho_FAKE",
+      "checks": [
+        {
+          "window": "initial",
+          "checkedAt": "2026-06-01T09:00:05.000Z",
+          "status": "dead",
+          "flip": false
+        },
+        {
+          "window": "24h",
+          "checkedAt": "2026-06-02T09:10:00.000Z",
+          "status": "unknown",
+          "flip": false
+        },
+        {
+          "window": "24h",
+          "checkedAt": "2026-06-02T10:10:00.000Z",
+          "status": "dead",
+          "flip": false
+        },
+        {
+          "window": "7d",
+          "checkedAt": "2026-06-08T09:30:00.000Z",
+          "status": "dead",
+          "flip": false
+        },
+        {
+          "window": "30d",
+          "checkedAt": "2026-07-01T09:05:00.000Z",
+          "status": "dead",
+          "flip": false
+        },
+        {
+          "window": "90d",
+          "checkedAt": "2026-08-30T09:00:00.000Z",
+          "status": "dead",
+          "flip": false
+        }
+      ]
+    }
+  ],
+  "verdict": "flipped"
+}

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GhostGrant demo report</title>
+  <meta name="description" content="A GhostGrant report for a fictional retired AI agent. Every credential in it is made up.">
+  <style>
+    :root { color-scheme: dark; --bg: #060606; --fg: #e4e4e7; --muted: #a1a1aa; --line: #27272a; --accent: #f59e0b; }
+    body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 Inter, system-ui, sans-serif; }
+    main { max-width: 860px; margin: 0 auto; padding: 32px 20px 64px; }
+    code, time, td { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 13px; }
+    h1 { font-size: 24px; margin: 0 0 8px; }
+    h2 { font-size: 16px; margin: 0 0 8px; }
+    .meta { color: var(--muted); overflow-wrap: anywhere; }
+    .note { color: var(--muted); border-left: 3px solid var(--accent); padding-left: 12px; }
+    .verdict { padding: 12px 16px; border: 1px solid var(--line); border-radius: 8px; }
+    .verdict.flipped, .verdict.alive, .verdict.unknown { border-color: #b91c1c; }
+    .verdict.clean { border-color: #15803d; }
+    .cred { margin-top: 28px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-weight: 500; }
+    tr.alive td { color: #fca5a5; }
+    tr.unknown td { color: #fcd34d; }
+    tr.dead td:last-child { color: #86efac; }
+    .flag { color: #f87171; }
+  </style>
+</head>
+<body>
+  <main>
+    <p>Loading the demo report.</p>
+  </main>
+  <noscript><p>This demo renders its report with JavaScript.</p></noscript>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

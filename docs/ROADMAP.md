@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/now-slice_8:_demo-F59E0B?style=for-the-badge" alt="Now: Slice 8, demo">
+  <img src="https://img.shields.io/badge/now-public_release-F59E0B?style=for-the-badge" alt="Now: public release">
   <img src="https://img.shields.io/badge/stage-incubating-2ea44f?style=for-the-badge" alt="Stage: incubating">
   <a href="README.md"><img src="https://img.shields.io/badge/↩-docs_home-6B7280?style=for-the-badge" alt="Back to docs"></a>
 </p>
@@ -47,9 +47,9 @@ is verified against mocked HTTP responses. No item needs a live credential.
 
 - [x] **Slice 4: report.** `ghostgrant report <agent-name>` prints a dated plain-text report and, with `--json`, the same data as JSON whose shape is a single exported TypeScript type. It lists every credential's result at every window checked so far. It makes no attestation or compliance claim. Tests cover an all-clean record, one with a flip, and an unknown agent name. — done 2026-10-22 by ghost-grant-roadmap: `Report` type in `src/report.ts`, live by default and `--mock` for mock checks, a one-line verdict where `unknown` is never clean, 47 tests
 
-## 🖥️ Slice 8: Static demo dashboard
+## 🖥️ Slice 8: Static demo dashboard (done 2026-10-24)
 
-- [ ] **Slice 8: static demo dashboard.** A static page under `site/` renders a report JSON file bundled with it: a fictional retired agent with GitHub credentials (the provider the first release supports) across all four windows, including one flip. The page imports the report type from Slice 4 so it can't drift from the CLI's output. `npm run build` also builds the page, and a test checks the bundled JSON against the type.
+- [x] **Slice 8: static demo dashboard.** A static page under `site/` renders a report JSON file bundled with it: a fictional retired agent with GitHub credentials (the provider the first release supports) across all four windows, including one flip. The page imports the report type from Slice 4 so it can't drift from the CLI's output. `npm run build` also builds the page, and a test checks the bundled JSON against the type. — done 2026-10-24 by ghost-grant-roadmap: `site/app.ts` renders `site/demo-report.json` (built by `buildReport` from `site/demo-record.json`, which the test re-runs and compares), `npm run build` writes the page to `_site/site/`, 50 tests
 
 ## 🚦 Public release
 

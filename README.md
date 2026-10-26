@@ -63,7 +63,7 @@ It is a local CLI. There's no GhostGrant server, no account, and no telemetry.
 | **Re-check windows and flip alerts** | ✅ Each `check` runs the window that's due (at decommission, then 24h, 7d, 30d, 90d) and skips records with nothing due. Dead-to-alive prints an `ALERT` and goes to `alerts.log`. |
 | **`ghostgrant report <agent>`** | ✅ A dated plain-text report of every check for one agent and what it found, or the same data with `--json`. [Reports](#-reports) |
 | **AWS IAM, Okta, Google Workspace** | Slices 5 to 7 |
-| **Static demo dashboard** | Slice 8. A mock report rendered in the browser |
+| **Static demo dashboard** | ✅ `site/` renders a bundled report for a fictional agent (GitHub credentials, every window, one flip) with the CLI's own `Report` type. `npm run build` writes it to `_site/site/`. Not hosted yet |
 
 What it won't do, on purpose: revoke anything for you, sign or "attest" its reports, or run
 as a hosted service. The [spec](docs/product/spec.md#explicitly-out-of-scope-wont-this-version)
@@ -75,7 +75,7 @@ says why.
 # 1. Install dependencies (Node 22.18 or newer)
 npm install
 
-# 2. Build the CLI into dist/
+# 2. Build the CLI into dist/ and the demo page into _site/site/
 npm run build
 
 # 3. Record the example manifest (format: docs/manifest.md) and check it in mock mode
@@ -142,6 +142,7 @@ isn't compliance evidence.
 | [**📚 docs/**](docs/README.md) | The roadmap, the changelog, and the product spec and build plan. |
 | [**🧰 src/**](src/README.md) | The CLI source. |
 | [**📝 examples/**](examples/manifest.yaml) | A sample manifest for a fictional agent, used in the quick start. |
+| [**🖥️ site/**](site/app.ts) | The static demo page: a bundled report for a fictional agent, rendered with the `Report` type from `src/`. |
 | [**🧪 tests/**](tests/cli.test.ts) | Tests for `node --test`, run straight from TypeScript. |
 | [**🤖 AGENTS.md**](AGENTS.md) | Standing orders for the agent that works the roadmap each week. `CLAUDE.md` imports it for Claude Code. |
 
