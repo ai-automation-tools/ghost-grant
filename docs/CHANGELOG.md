@@ -24,6 +24,9 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 - GitHub adapter. `ghostgrant check --live` reads tokens from stdin, pairs each with a recorded credential by prefix, and asks GitHub's `GET /user`: 200 is alive, 401 is dead, and a timeout, 5xx or rate limit is unknown. Tokens are never printed or stored. `check` now needs `--mock` or `--live`. *Build*
 - `ghostgrant decommission <manifest.yaml>` validates a manifest, refuses anything shaped like a raw secret without echoing it, and writes a record with a timestamp and the manifest's SHA-256. `ghostgrant check --mock` prints canned alive/dead for every recorded credential. Manifest format in `docs/manifest.md`. New runtime dependency: `yaml`. *Build*
 
+**Fixed**
+- The GitHub adapter's timeout uses a plain `setTimeout` instead of `AbortSignal.timeout`, whose timer is unref'd: on Node 22 a request holding nothing else open let the process exit before the timeout fired. The first CI run caught it as two cancelled tests.
+
 **Changed**
 - Moved to the org folder layout: the agent instructions are in `AGENTS.md` now (Codex, Gemini CLI and opencode read it), and `CLAUDE.md` is a bare `@AGENTS.md` import for Claude Code. The test folder is `tests/` instead of `test/`, with every path that named it updated.
 
