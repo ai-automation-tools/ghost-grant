@@ -65,9 +65,19 @@ It is a local CLI. There's no GhostGrant server, no account, and no telemetry.
 | **AWS IAM, Okta, Google Workspace** | Slices 5 to 7 |
 | **Static demo dashboard** | ✅ `site/` renders a bundled report for a fictional agent (GitHub credentials, every window, one flip) with the CLI's own `Report` type. `npm run build` writes it to `_site/site/`. Not hosted yet |
 
-What it won't do, on purpose: revoke anything for you, sign or "attest" its reports, or run
-as a hosted service. The [spec](docs/product/spec.md#explicitly-out-of-scope-wont-this-version)
-says why.
+## 🚫 What it won't do
+
+These are out of scope on purpose, so please don't open an issue asking for them. The
+[spec](docs/product/spec.md#explicitly-out-of-scope-wont-this-version) says why.
+
+- **Revoke or rotate anything.** GhostGrant only asks read-only introspection endpoints. It
+  never holds a credential that can change anything at a provider.
+- **Sign or "attest" its reports.** A report says what was checked and what each provider
+  answered. It isn't audit-grade or compliance evidence.
+- **Run as a hosted service.** No server, no dashboard, no account, no billing. The demo
+  page is static.
+- **Support providers beyond the five.** GitHub, Slack, AWS IAM, Okta and Google Workspace,
+  and nothing else this version.
 
 ## 🚀 Quick start
 
@@ -86,6 +96,10 @@ node dist/cli.js report billing-bot --mock
 # 4. Tests and lint
 npm test && npm run lint
 ```
+
+`node dist/cli.js --help` lists every command and flag, and `--version` prints the version.
+Records live under `$GHOSTGRANT_HOME` (default `~/.ghostgrant`); point it somewhere else to
+try things without touching your real records.
 
 ## 🔑 Live checks
 
@@ -144,6 +158,8 @@ isn't compliance evidence.
 | [**📝 examples/**](examples/manifest.yaml) | A sample manifest for a fictional agent, used in the quick start. |
 | [**🖥️ site/**](site/app.ts) | The static demo page: a bundled report for a fictional agent, rendered with the `Report` type from `src/`. |
 | [**🧪 tests/**](tests/cli.test.ts) | Tests for `node --test`, run straight from TypeScript. |
+| [**🔒 SECURITY.md**](SECURITY.md) | How to report a vulnerability, and why every token-shaped fixture here is fake. |
+| [**⚙️ .github/workflows/**](.github/workflows/ci.yml) | CI: `npm ci`, lint, test and build on every push to `main` and every PR. |
 | [**🤖 AGENTS.md**](AGENTS.md) | Standing orders for the agent that works the roadmap each week. `CLAUDE.md` imports it for Claude Code. |
 
 ## 🔗 Related repositories
