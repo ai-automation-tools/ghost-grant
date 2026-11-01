@@ -33,3 +33,15 @@ test("the page renders every credential, the flip and the verdict, escaping what
   const evil = renderReport({ ...bundled, agent: "<img src=x onerror=alert(1)>" });
   assert.ok(!evil.includes("<img") && evil.includes("&lt;img"));
 });
+
+test("the page opens with the org source bar and loads nothing from another host", () => {
+  const html = readFileSync(new URL("../site/index.html", import.meta.url), "utf8");
+  const body = html.slice(html.indexOf("<body>") + "<body>".length).trimStart();
+  assert.ok(body.startsWith('<div class="src-bar">'), "the source bar is the first thing in the body");
+  assert.match(body, /<strong>Demo<\/strong>[^<]*made-up credentials/);
+  assert.match(body, /<a class="src-link" href="https:\/\/github\.com\/ai-automation-tools\/ghost-grant"[^>]*>[\s\S]*View source/);
+  // The only absolute URL is the View source link, which is a link, not a request.
+  const urls = html.match(/(?:src|href)="[^"]*"/g)!.filter((a) => !a.includes('"./'));
+  assert.deepEqual(urls, ['href="https://github.com/ai-automation-tools/ghost-grant"']);
+  assert.ok(!/url\(|@import|fetch\("http/.test(html));
+});

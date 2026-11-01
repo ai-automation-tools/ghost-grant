@@ -16,6 +16,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 ## Unreleased
 
 **Added**
+- Pages workflow (`.github/workflows/pages.yml`): every push to `main` builds the demo page and deploys it with `actions/deploy-pages` to `https://ai-automation-tools.dev/ghost-grant/`. The page now opens with the org source bar (a demo notice and a View source link to this repo), a test checks the bar and that the page loads nothing from another host, and the README hero links the demo.
 - `SECURITY.md`: report vulnerabilities privately through GitHub, what's in scope (a secret reaching disk or output, a token sent to the wrong host, a false `dead` or `clean`), and a note that every token-shaped fixture in the repo is fake. A full-history `gitleaks` scan came back clean. *Public release*
 - CI workflow: `npm ci`, `npm run lint`, `npm test` and `npm run build` on every push to `main` and every PR, with `permissions: contents: read`. Its first run on `main` passed. *Public release*
 - Static demo page in `site/`. It renders a bundled report for a fictional retired agent, `triage-bot`, with three made-up GitHub credentials checked at every window and one dead-to-alive flip, using the CLI's own `Report` type so the page can't drift from `ghostgrant report --json`. `npm run build` also builds the page into `_site/site/`, and a test rebuilds the bundled JSON from its demo record with `buildReport` and compares the two. Not hosted yet. *Build*
