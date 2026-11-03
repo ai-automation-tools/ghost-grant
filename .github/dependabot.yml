@@ -1,0 +1,28 @@
+# Dependency updates. Minor/patch bumps arrive as one grouped PR per ecosystem per week;
+# major versions are ignored: the biweekly upstream check flags a major that breaks
+# something, and Dependabot security alerts still fire for any version.
+# Semantic upstream drift (provider introspection endpoints, Node, GitHub Pages) is the
+# Ghost-Grant Upstream Check routine's job -- see docs/UPSTREAMS.md. CI (lint + test +
+# build) gates every PR.
+# typescript is held at ~6.0 by hand until typescript-eslint supports 7.x.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule: { interval: weekly, day: monday }
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule: { interval: weekly, day: monday }
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
