@@ -36,8 +36,8 @@
 ---
 
 > [!WARNING]
-> **Only GitHub is wired up so far.** `check --live` asks GitHub; Slack and AWS answer
-> `unknown` until their adapters land.
+> **GitHub and Slack are wired up so far.** `check --live` asks GitHub and Slack; AWS,
+> Okta and Google Workspace answer `unknown` until their adapters land.
 > See the [roadmap](docs/ROADMAP.md).
 
 ## 💡 What it's for
@@ -62,7 +62,7 @@ It is a local CLI. There's no GhostGrant server, no account, and no telemetry.
 | **`ghostgrant decommission <manifest>`** | ✅ Records a decommission entry with a timestamp and the manifest's checksum. [Manifest format](docs/manifest.md) |
 | **`ghostgrant check --mock`** | ✅ Runs every check that's due against canned responses and prints alive/dead |
 | **`ghostgrant check --live`** | ✅ GitHub: asks `GET /user` with each token you pipe in. 200 is alive, 401 is dead, a timeout, 5xx or rate limit is unknown. [Live checks](#-live-checks) |
-| **Slack adapter** | Slice 2. Alive/dead from `auth.test` |
+| **Slack adapter** | ✅ `check --live` asks Slack's `auth.test`. `ok: true` is alive; `invalid_auth`, `token_revoked` or `account_inactive` is dead; any other error, a 429, 5xx or timeout is unknown. |
 | **Re-check windows and flip alerts** | ✅ Each `check` runs the window that's due (at decommission, then 24h, 7d, 30d, 90d) and skips records with nothing due. Dead-to-alive prints an `ALERT` and goes to `alerts.log`. |
 | **`ghostgrant report <agent>`** | ✅ A dated plain-text report of every check for one agent and what it found, or the same data with `--json`. [Reports](#-reports) |
 | **AWS IAM, Okta, Google Workspace** | Slices 5 to 7 |
@@ -111,7 +111,7 @@ stdin, one per line. Each token goes to the credential whose `prefix` it starts 
 sent to that provider once, and is dropped when the run ends. Nothing prints or stores it.
 
 ```bash
-printenv OLD_AGENT_GH_TOKEN | node dist/cli.js check --live
+printenv OLD_AGENT_GH_TOKEN OLD_AGENT_SLACK_TOKEN | node dist/cli.js check --live
 ```
 
 A credential with no matching token, or more than one, reports `unknown` and nobody is

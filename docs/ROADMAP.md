@@ -64,7 +64,7 @@ Nothing below blocks go-live.
 
 ### 🧩 Fast-follow slices
 
-- [ ] **Slice 2: Slack adapter.** Same shape as Slice 1, calling `auth.test`: `ok: true` is alive, `invalid_auth`/`token_revoked`/`account_inactive` are dead, anything else is unknown. Mocked tests for each, and the adapter interface from Slice 1 holds without changes (or the PR says what changed and why).
+- [x] **Slice 2: Slack adapter.** Same shape as Slice 1, calling `auth.test`: `ok: true` is alive, `invalid_auth`/`token_revoked`/`account_inactive` are dead, anything else is unknown. Mocked tests for each, and the adapter interface from Slice 1 holds without changes (or the PR says what changed and why). — done 2026-11-03 by ghost-grant-roadmap: `slack` in `src/adapters.ts` POSTs `auth.test` with a bearer header; the `Adapter` type is unchanged, the timeout wrapper is now shared with `github`; 66 tests
 - [ ] **Slice 5: AWS IAM adapter.** Calls STS `GetCallerIdentity` for an access key ID, signing requests with SigV4 written here or with the smallest AWS SDK client that does it (the PR says which and why). `InvalidClientTokenId` is dead, a valid identity is alive, throttling and network errors are unknown. Mocked tests for each, and no secret access key ever appears in a log, record or report.
 - [ ] **Slice 6: Okta adapter.** Same shape as Slices 1 and 2, mocked tests, no live tenant needed.
 - [ ] **Slice 7: Google Workspace adapter.** Same shape, mocked tests. The build plan flags this one as the widest estimate.

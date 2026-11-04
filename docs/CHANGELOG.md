@@ -16,6 +16,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 ## Unreleased
 
 **Added**
+- Slack adapter. `ghostgrant check --live` now asks Slack's `auth.test` for any `slack` credential with a matching token on stdin: `ok: true` is alive, `invalid_auth`, `token_revoked` or `account_inactive` is dead, and any other error, a 429, 5xx, timeout or non-JSON body is unknown. The token goes only in the `Authorization` header and is never printed or stored. *After public release*
 - `docs/UPSTREAMS.md` and `.github/dependabot.yml`: the upstream worklist for the biweekly upstream check, and weekly grouped minor/patch Dependabot updates for npm and GitHub Actions.
 - Release gate *Live demo* ticked: the demo serves at `https://ghost-grant-demo.ai-automation-tools.dev/` (the old `ai-automation-tools.dev/ghost-grant/` path redirects there). *Public release*
 - Pages workflow (`.github/workflows/pages.yml`): every push to `main` builds the demo page and deploys it with `actions/deploy-pages` to `https://ai-automation-tools.dev/ghost-grant/`. The page now opens with the org source bar (a demo notice and a View source link to this repo), a test checks the bar and that the page loads nothing from another host, and the README hero links the demo.

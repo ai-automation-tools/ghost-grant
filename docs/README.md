@@ -20,6 +20,7 @@
 |:---|:---|
 | [**🗺️ ROADMAP.md**](ROADMAP.md) | The release gates, one per weekly run, plus what waits until after the repo goes public. |
 | [**📋 CHANGELOG.md**](CHANGELOG.md) | Every change, newest first. Roadmap items show up here the week they're ticked. |
+| [**❓ OPEN-QUESTIONS.md**](OPEN-QUESTIONS.md) | Decisions a roadmap run is waiting on Mike for. |
 
 ## 🧰 Using it
 
