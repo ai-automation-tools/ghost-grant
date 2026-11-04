@@ -195,9 +195,39 @@ test("check --live sends the matching stdin token to GitHub and never prints it"
   assert.equal(r.code, 0, r.err);
   assert.deepEqual(calls, [`https://api.github.com/user Bearer ${LIVE_TOKEN}`]);
   assert.match(r.out, /github .*ghp_FAKE\s+dead\n/);
-  assert.match(r.out, /slack .*unknown \(no live adapter/);
+  assert.match(r.out, /slack .*unknown \(no token on stdin matches/);
   assert.ok(!r.out.includes(LIVE_TOKEN) && !r.err.includes(LIVE_TOKEN), "the token was echoed");
   assert.ok(!readFileSync(join(s.home, "records", "billing-bot.json"), "utf8").includes(LIVE_TOKEN));
+});
+
+// Fake on purpose: Slack's bot prefix and nothing real after it.
+const SLACK_TOKEN = "xoxb-FAKE-FAKE-FAKEFAKEFAKEFAKE";
+
+test("check --live sends each stdin token to its own provider and never prints either", async () => {
+  const s = sandbox();
+  await s.exec(["decommission", s.write("m.yaml", VALID)]);
+  const calls: string[] = [];
+  const r = await s.exec(["check", "--live"], {
+    readSecrets: async () => [LIVE_TOKEN, SLACK_TOKEN],
+    fetch: async (url, init) => {
+      calls.push(`${url} ${new Headers(init?.headers).get("authorization")}`);
+      return String(url).startsWith("https://slack.com/")
+        ? new Response(JSON.stringify({ ok: false, error: "token_revoked" }), { status: 200 })
+        : new Response("{}", { status: 401 });
+    },
+  });
+  assert.equal(r.code, 0, r.err);
+  assert.deepEqual(calls.sort(), [
+    `https://api.github.com/user Bearer ${LIVE_TOKEN}`,
+    `https://slack.com/api/auth.test Bearer ${SLACK_TOKEN}`,
+  ]);
+  assert.match(r.out, /github .*ghp_FAKE\s+dead\n/);
+  assert.match(r.out, /slack .*xoxb-FAKE\s+dead\n/);
+  const rec = readFileSync(join(s.home, "records", "billing-bot.json"), "utf8");
+  for (const t of [LIVE_TOKEN, SLACK_TOKEN]) {
+    assert.ok(!r.out.includes(t) && !r.err.includes(t), "a token was echoed");
+    assert.ok(!rec.includes(t), "a token reached the record");
+  }
 });
 
 test("check --live without a matching token reports unknown and calls nobody", async () => {
