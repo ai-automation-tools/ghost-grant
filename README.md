@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://ai-automation-tools.dev/ghost-grant/">View Demo</a>
+  <a href="https://ghost-grant-demo.ai-automation-tools.dev/">View Demo</a>
   ·
   <a href="docs/ROADMAP.md">Roadmap</a>
   ·
@@ -21,7 +21,7 @@
 </p>
 
 <p align="center">
-  <a href="https://ai-automation-tools.dev/ghost-grant/"><img src="https://img.shields.io/badge/live_demo-ai--automation--tools.dev%2Fghost--grant-2ea44f?style=for-the-badge&logo=github&logoColor=white" alt="Live demo at ai-automation-tools.dev/ghost-grant"></a>
+  <a href="https://ghost-grant-demo.ai-automation-tools.dev/"><img src="https://img.shields.io/badge/live_demo-ghost--grant--demo.ai--automation--tools.dev-2ea44f?style=for-the-badge&logo=github&logoColor=white" alt="Live demo at ghost-grant-demo.ai-automation-tools.dev"></a>
   <img src="https://img.shields.io/badge/status-MVP_Prototype-F59E0B?style=for-the-badge" alt="Status: MVP prototype">
   <a href="docs/ROADMAP.md"><img src="https://img.shields.io/badge/plan-ROADMAP-8B5CF6?style=for-the-badge" alt="Roadmap"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2ea44f?style=for-the-badge" alt="License: MIT"></a>
@@ -66,7 +66,7 @@ It is a local CLI. There's no GhostGrant server, no account, and no telemetry.
 | **Re-check windows and flip alerts** | ✅ Each `check` runs the window that's due (at decommission, then 24h, 7d, 30d, 90d) and skips records with nothing due. Dead-to-alive prints an `ALERT` and goes to `alerts.log`. |
 | **`ghostgrant report <agent>`** | ✅ A dated plain-text report of every check for one agent and what it found, or the same data with `--json`. [Reports](#-reports) |
 | **AWS IAM, Okta, Google Workspace** | Slices 5 to 7 |
-| **Static demo dashboard** | ✅ `site/` renders a bundled report for a fictional agent (GitHub credentials, every window, one flip) with the CLI's own `Report` type. `npm run build` writes it to `_site/site/`, and the Pages workflow publishes it to [ai-automation-tools.dev/ghost-grant](https://ai-automation-tools.dev/ghost-grant/) on every push to `main` |
+| **Static demo dashboard** | ✅ `site/` renders a bundled report for a fictional agent (GitHub credentials, every window, one flip) with the CLI's own `Report` type. `npm run build` writes it to `_site/site/`, and the Pages workflow publishes it to [ghost-grant-demo.ai-automation-tools.dev](https://ghost-grant-demo.ai-automation-tools.dev/) on every push to `main` |
 
 ## 🚫 What it won't do
 

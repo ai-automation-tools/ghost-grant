@@ -1,6 +1,6 @@
 name: Pages
 
-# Publishes the static demo in site/ to https://ai-automation-tools.dev/ghost-grant/.
+# Publishes the static demo in site/ to https://ghost-grant-demo.ai-automation-tools.dev/.
 on:
   push:
     branches:
