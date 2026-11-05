@@ -13,7 +13,7 @@
 ---
 
 The Ghost-Grant Weekly Roadmap routine works this file top to bottom every Tuesday,
-Thursday and Saturday: it takes the first open item that isn't `🔒 Needs Mike` (or up to six `small`
+Thursday and Saturday: it takes the first open item that isn't `🔒 Needs owner` (or up to six `small`
 ones), builds it, ticks it and opens a `roadmap/auto-<date>` PR. **Every item above `##
 After public release` is a release gate.** GhostGrant goes public when all of them are
 ticked and Mike says so. Ticking an item adds its line to the [changelog](CHANGELOG.md) and
@@ -21,7 +21,7 @@ updates any doc it made stale, in the same commit.
 
 Markers: `- [ ]` open, `- [-]` claimed by a run in progress, `- [x]` done, `- [!]` blocked
 (the reason follows on the line). `small` marks docs or config a run can batch, up to six
-per PR (untagged means a feature, one per run); `🔒 Needs Mike` marks one only Mike can do.
+per PR (untagged means a feature, one per run); `🔒 Needs owner` marks one only the owner can do.
 
 The slices come from [product/build-plan.md](product/build-plan.md). The Okta and Google
 Workspace adapters (Slices 6 and 7) sit below the release line because the build plan's
@@ -73,15 +73,15 @@ Nothing below blocks go-live.
 
 ### 📣 Publish and promote
 
-- [ ] Hand the tool to one real security or platform engineer at a small company and write down whether they'd run it. This is the build plan's checkpoint for the memo's key assumption. 🔒 Needs Mike
-- [ ] Tag v0.1 and publish the CLI to npm as `ghostgrant` (check the name is still free first). 🔒 Needs Mike
-- [ ] Launch post with one real example report, sent to the two or three places platform engineers running AI agents read. 🔒 Needs Mike
-- [ ] Custom subdomain `ghost-grant.ai-automation-tools.dev`. 🔒 Needs Mike
-- [ ] Twelve weeks after v0.1, check the falsifier: under 20 stars and 2 or fewer unprompted issues means stop adding providers and rethink. 🔒 Needs Mike
+- [ ] Hand the tool to one real security or platform engineer at a small company and write down whether they'd run it. This is the build plan's checkpoint for the memo's key assumption. 🔒 Needs owner
+- [ ] Tag v0.1 and publish the CLI to npm as `ghostgrant` (check the name is still free first). 🔒 Needs owner
+- [ ] Launch post with one real example report, sent to the two or three places platform engineers running AI agents read. 🔒 Needs owner
+- [ ] Custom subdomain `ghost-grant.ai-automation-tools.dev`. 🔒 Needs owner
+- [ ] Twelve weeks after v0.1, check the falsifier: under 20 stars and 2 or fewer unprompted issues means stop adding providers and rethink. 🔒 Needs owner
 
 ### 💰 Revenue
 
-- [ ] Decide whether the hosted attestation tier cut from the idea card is worth revisiting, using stars, npm downloads and issues as the evidence. Its own spec and ADR if yes. 🔒 Needs Mike
+- [ ] Decide whether the hosted attestation tier cut from the idea card is worth revisiting, using stars, npm downloads and issues as the evidence. Its own spec and ADR if yes. 🔒 Needs owner
 
 ---
 
