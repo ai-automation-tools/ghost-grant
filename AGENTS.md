@@ -15,7 +15,7 @@ Providers: GitHub, Slack and AWS IAM before public release; Okta and Google Work
 
 The bet under the project: security and platform engineers at small companies will run a
 free tool for this. After Slice 4 the tool is usable enough to put in front of one; that's a
-Needs Mike step, not yours.
+Needs owner step, not yours.
 
 Full spec: `docs/product/spec.md`. Slice order: `docs/product/build-plan.md`. Work queue:
 `docs/ROADMAP.md`.
