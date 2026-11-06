@@ -13,7 +13,7 @@
 ---
 
 The Ghost-Grant Weekly Roadmap routine works this file top to bottom every Tuesday,
-Thursday and Saturday: it takes the first open item that isn't `🔒 Needs Mike` (or up to six `small`
+Thursday and Saturday: it takes the first open item that isn't `🔒 Needs owner` (or up to six `small`
 ones), builds it, ticks it and opens a `roadmap/auto-<date>` PR. **Every item above `##
 After public release` is a release gate.** GhostGrant goes public when all of them are
 ticked and Mike says so. Ticking an item adds its line to the [changelog](CHANGELOG.md) and
@@ -21,7 +21,7 @@ updates any doc it made stale, in the same commit.
 
 Markers: `- [ ]` open, `- [-]` claimed by a run in progress, `- [x]` done, `- [!]` blocked
 (the reason follows on the line). `small` marks docs or config a run can batch, up to six
-per PR (untagged means a feature, one per run); `🔒 Needs Mike` marks one only Mike can do.
+per PR (untagged means a feature, one per run); `🔒 Needs owner` marks one only the owner can do.
 
 The slices come from [product/build-plan.md](product/build-plan.md). The Okta and Google
 Workspace adapters (Slices 6 and 7) sit below the release line because the build plan's
@@ -65,6 +65,7 @@ Nothing below blocks go-live.
 ### 🧩 Fast-follow slices
 
 - [x] **Slice 2: Slack adapter.** Same shape as Slice 1, calling `auth.test`: `ok: true` is alive, `invalid_auth`/`token_revoked`/`account_inactive` are dead, anything else is unknown. Mocked tests for each, and the adapter interface from Slice 1 holds without changes (or the PR says what changed and why). — done 2026-11-03 by ghost-grant-roadmap: `slack` in `src/adapters.ts` POSTs `auth.test` with a bearer header; the `Adapter` type is unchanged, the timeout wrapper is now shared with `github`; 66 tests
+- [ ] **Agent Security Suite inventory format.** Read and write the suite's shared format, [agent inventory schema v0.1](https://ai-automation-tools.dev/schemas/agent-inventory/v0.1.json) (vendor it to `schemas/agent-inventory.schema.json`, never edit the copy). `ghost-grant import <inventory.json>` takes the identities with `status: "retired"` and their `credentials[]` (fingerprints only) as the check list; each re-check writes `lastVerifiedDeadAt` on a dead credential and a finding with `ruleId` `ghost-grant/credential-still-live` (severity `critical`) for a live one; `ghost-grant export --format inventory` writes a schema-valid document. Every read and write is validated against the schema, an invalid file exits non-zero naming the first error, another producer's `x` keys round-trip unchanged, and the demo can download its sample as an inventory. Why: other suite tools (an MCP config scanner, a granted-versus-used trimmer) emit this format, so a retired agent found by one can be proven dead by this one without re-keying.
 - [ ] **Slice 5: AWS IAM adapter.** Calls STS `GetCallerIdentity` for an access key ID, signing requests with SigV4 written here or with the smallest AWS SDK client that does it (the PR says which and why). `InvalidClientTokenId` is dead, a valid identity is alive, throttling and network errors are unknown. Mocked tests for each, and no secret access key ever appears in a log, record or report.
 - [ ] **Slice 6: Okta adapter.** Same shape as Slices 1 and 2, mocked tests, no live tenant needed.
 - [ ] **Slice 7: Google Workspace adapter.** Same shape, mocked tests. The build plan flags this one as the widest estimate.
@@ -73,15 +74,15 @@ Nothing below blocks go-live.
 
 ### 📣 Publish and promote
 
-- [ ] Hand the tool to one real security or platform engineer at a small company and write down whether they'd run it. This is the build plan's checkpoint for the memo's key assumption. 🔒 Needs Mike
-- [ ] Tag v0.1 and publish the CLI to npm as `ghostgrant` (check the name is still free first). 🔒 Needs Mike
-- [ ] Launch post with one real example report, sent to the two or three places platform engineers running AI agents read. 🔒 Needs Mike
-- [ ] Custom subdomain `ghost-grant.ai-automation-tools.dev`. 🔒 Needs Mike
-- [ ] Twelve weeks after v0.1, check the falsifier: under 20 stars and 2 or fewer unprompted issues means stop adding providers and rethink. 🔒 Needs Mike
+- [ ] Hand the tool to one real security or platform engineer at a small company and write down whether they'd run it. This is the build plan's checkpoint for the memo's key assumption. 🔒 Needs owner
+- [ ] Tag v0.1 and publish the CLI to npm as `ghostgrant` (check the name is still free first). 🔒 Needs owner
+- [ ] Launch post with one real example report, sent to the two or three places platform engineers running AI agents read. 🔒 Needs owner
+- [ ] Custom subdomain `ghost-grant.ai-automation-tools.dev`. 🔒 Needs owner
+- [ ] Twelve weeks after v0.1, check the falsifier: under 20 stars and 2 or fewer unprompted issues means stop adding providers and rethink. 🔒 Needs owner
 
 ### 💰 Revenue
 
-- [ ] Decide whether the hosted attestation tier cut from the idea card is worth revisiting, using stars, npm downloads and issues as the evidence. Its own spec and ADR if yes. 🔒 Needs Mike
+- [ ] Decide whether the hosted attestation tier cut from the idea card is worth revisiting, using stars, npm downloads and issues as the evidence. Its own spec and ADR if yes. 🔒 Needs owner
 
 ---
 
