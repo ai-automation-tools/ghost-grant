@@ -15,6 +15,9 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 
 ## Unreleased
 
+**Docs**
+- The README's related repositories table links CloakScan, the org's other agent-security tool.
+
 **Added**
 - Slack adapter. `ghostgrant check --live` now asks Slack's `auth.test` for any `slack` credential with a matching token on stdin: `ok: true` is alive, `invalid_auth`, `token_revoked` or `account_inactive` is dead, and any other error, a 429, 5xx, timeout or non-JSON body is unknown. The token goes only in the `Authorization` header and is never printed or stored. *After public release*
 - `docs/UPSTREAMS.md` and `.github/dependabot.yml`: the upstream worklist for the biweekly upstream check, and weekly grouped minor/patch Dependabot updates for npm and GitHub Actions.
