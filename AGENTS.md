@@ -38,7 +38,10 @@ Full spec: `docs/product/spec.md`. Slice order: `docs/product/build-plan.md`. Wo
 - The demo page (Slice 8) lives in `site/` and imports the report type from `src/`, so the
   page and the CLI share one definition of the report shape. `npm run build` writes the
   page to `_site/site/`; `site/demo-report.json` is `buildReport` run on
-  `site/demo-record.json`, and `tests/site.test.ts` fails if the two drift.
+  `site/demo-record.json`, and `tests/site.test.ts` fails if the two drift. The same goes
+  for `site/demo-inventory.json`, which is `exportInventory` run on that record.
+- `schemas/agent-inventory.schema.json` is the suite's inventory schema, vendored. Never edit
+  it; a new schema version is a new vendored copy and a roadmap item.
 
 ## Verify
 

@@ -9,7 +9,8 @@
     "ghostgrant": "dist/cli.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "schemas"
   ],
   "engines": {
     "node": ">=22.18"
@@ -18,7 +19,7 @@
     "build": "tsc -p tsconfig.build.json && npm run build:site",
     "test": "node --test",
     "lint": "eslint . && tsc --noEmit",
-    "build:site": "tsc -p site/tsconfig.json && node -e \"for (const f of ['index.html', 'demo-report.json', 'favicon.svg']) require('fs').cpSync('site/' + f, '_site/site/' + f)\""
+    "build:site": "tsc -p site/tsconfig.json && node -e \"for (const f of ['index.html', 'demo-report.json', 'demo-inventory.json', 'favicon.svg']) require('fs').cpSync('site/' + f, '_site/site/' + f)\""
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

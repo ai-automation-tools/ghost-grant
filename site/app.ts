@@ -25,7 +25,7 @@ export function renderReport(r: Report): string {
         )
         .join("");
       return (
-        `<section class="cred"><h2>${esc(c.provider)} ${esc(c.type)} <code>${esc(c.prefix)}</code></h2>` +
+        `<section class="cred"><h2>${esc(c.provider)} ${esc(c.type)} <code>${esc(c.prefix || c.fingerprint || "")}</code></h2>` +
         (rows
           ? `<table><thead><tr><th>Window</th><th>Checked at</th><th>Answer</th></tr></thead><tbody>${rows}</tbody></table>`
           : "<p>Not checked yet.</p>") +

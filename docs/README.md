@@ -27,6 +27,7 @@
 | Document | What's inside |
 |:---|:---|
 | [**📝 manifest.md**](manifest.md) | The manifest's fields, what gets rejected, and where records are kept. |
+| [**🧩 inventory.md**](inventory.md) | Importing and exporting the Agent Security Suite's shared inventory format. |
 
 ## 📦 Product
 

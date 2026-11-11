@@ -6,8 +6,9 @@ export type Provider = (typeof PROVIDERS)[number];
 export type Credential = {
   provider: Provider;
   type: string;
-  prefix: string;
-  hash: string;
+  prefix: string; // empty for a credential imported from an inventory
+  hash: string; // or "inventory:<credential id>" for an imported credential
+  fingerprint?: string; // from an inventory: the start of the secret's SHA-256 in hex
 };
 
 export type Manifest = {
@@ -41,7 +42,7 @@ export function looksLikeSecret(s: string): boolean {
 }
 
 // Every string in the document, keys included, with a path for error messages.
-function* strings(v: unknown, path: string): Generator<[string, string]> {
+export function* strings(v: unknown, path: string): Generator<[string, string]> {
   if (typeof v === "string") yield [path, v];
   else if (Array.isArray(v)) for (const [i, x] of v.entries()) yield* strings(x, `${path}[${i}]`);
   else if (v && typeof v === "object")

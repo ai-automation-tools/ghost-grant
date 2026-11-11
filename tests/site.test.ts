@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
+import { exportInventory, type Inventory, validateInventory } from "../src/inventory.ts";
 import type { DecommissionRecord } from "../src/records.ts";
 import { buildReport, type Report } from "../src/report.ts";
 import { renderReport } from "../site/app.ts";
@@ -32,6 +33,18 @@ test("the page renders every credential, the flip and the verdict, escaping what
   assert.ok(!html.includes("sha256:1111"), "hashes stay out of the page");
   const evil = renderReport({ ...bundled, agent: "<img src=x onerror=alert(1)>" });
   assert.ok(!evil.includes("<img") && evil.includes("&lt;img"));
+});
+
+test("the downloadable demo inventory is the CLI's export of the demo record, and schema-valid", () => {
+  // Regenerate with exportInventory([demo-record.json], "mock", new Date(generatedAt), version).
+  const inv: Inventory = read("demo-inventory.json");
+  assert.deepEqual(inv, exportInventory([record], "mock", new Date(inv.generatedAt), inv.producer.version));
+  assert.equal(validateInventory(inv), undefined);
+  assert.ok(inv.identities[0].credentials!.every((c) => c.lastVerifiedDeadAt === "2026-08-30T09:00:00.000Z"));
+  assert.ok(!JSON.stringify(inv).includes("sha256:"), "hashes stay out of the inventory");
+  const html = readFileSync(new URL("../site/index.html", import.meta.url), "utf8");
+  assert.match(html, /<a href="\.\/demo-inventory\.json" download>/);
+  assert.match(readFileSync(new URL("../package.json", import.meta.url), "utf8"), /'demo-inventory\.json'/);
 });
 
 test("the page opens with the org source bar and loads nothing from another host", () => {
