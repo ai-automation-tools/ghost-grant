@@ -21,7 +21,8 @@ export type ReportCheck = {
 export type ReportCredential = {
   provider: Provider;
   type: string;
-  prefix: string;
+  prefix: string; // empty for a credential imported from an inventory
+  fingerprint?: string; // an imported credential's inventory fingerprint
   checks: ReportCheck[]; // every attempt, oldest first, unknowns included
 };
 
@@ -58,7 +59,8 @@ export function buildReport(r: DecommissionRecord, source: CheckResult["source"]
       });
     alive ||= last === "alive";
     unknown ||= windows.some((w) => !checks.some((c) => c.window === w && c.status !== "unknown"));
-    return { provider: cred.provider, type: cred.type, prefix: cred.prefix, checks };
+    const fingerprint = cred.fingerprint ? { fingerprint: cred.fingerprint } : {};
+    return { provider: cred.provider, type: cred.type, prefix: cred.prefix, ...fingerprint, checks };
   });
   const verdict: Verdict =
     history.length === 0 ? "not-checked"
@@ -99,7 +101,7 @@ export function formatReport(r: Report): string {
     `Decommissioned ${r.decommissionedAt}, manifest sha256 ${r.manifestSha256}`,
   ];
   for (const c of r.credentials) {
-    lines.push("", `${c.provider} ${c.type} ${c.prefix}`);
+    lines.push("", [c.provider, c.type, c.prefix, c.fingerprint && `fingerprint ${c.fingerprint}`].filter(Boolean).join(" "));
     if (c.checks.length === 0) lines.push("  not checked yet");
     for (const k of c.checks) {
       lines.push(`  ${k.window.padEnd(8)} ${k.checkedAt}  ${k.status}${k.flip ? "  FLIP: was dead, alive again" : ""}`);

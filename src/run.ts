@@ -5,6 +5,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { text } from "node:stream/consumers";
 import { ADAPTERS, type Status } from "./adapters.ts";
+import { exportInventory, InventoryError, parseInventory, recordsFromInventory, validateInventory } from "./inventory.ts";
 import { type Credential, looksLikeSecret, ManifestError, parseManifest } from "./manifest.ts";
 import {
   appendAlert,
@@ -24,11 +25,15 @@ const HELP = `ghostgrant ${version}
 
 Usage:
   ghostgrant decommission <manifest.yaml>   Record a retired agent's credentials to verify
+  ghostgrant import <inventory.json>        Record every retired identity in an Agent Security
+                                            Suite inventory (schema v0.1)
   ghostgrant check --mock                   Run every check that's due against canned responses
   ghostgrant check --live                   Run every check that's due, asking each provider with
                                             tokens read from stdin (one per line)
   ghostgrant report <agent-name>            Print every live check for one agent and what it found
                                             (--mock for the mock checks, --json for JSON)
+  ghostgrant export --format inventory      Print every record as an Agent Security Suite
+                                            inventory (--mock for the mock checks)
   ghostgrant --version                      Print the version
   ghostgrant --help                         Print this help
 
@@ -100,13 +105,19 @@ function decommission(path: string | undefined, ctx: Context): number {
   }
 }
 
-// The token for a credential is the one supplied token that starts with its prefix. No
-// match, or more than one, leaves the credential unchecked rather than guessing.
+const label = (c: Credential) => c.prefix || c.fingerprint || c.hash;
+const sha256 = (s: string | Buffer) => createHash("sha256").update(s).digest("hex");
+
+// The token for a credential is the one supplied token that starts with its prefix, or for
+// an imported credential, whose SHA-256 starts with its fingerprint. No match, or more than
+// one, leaves the credential unchecked rather than guessing.
 async function liveStatus(c: Credential, tokens: string[], ctx: Context): Promise<[Status, string?]> {
   const adapter = ADAPTERS[c.provider];
   if (!adapter) return ["unknown", "no live adapter for this provider yet"];
-  const matches = tokens.filter((t) => t.startsWith(c.prefix));
-  if (matches.length === 0) return ["unknown", "no token on stdin matches this prefix"];
+  if (!c.prefix && !c.fingerprint) return ["unknown", "no prefix or fingerprint to pair a token with"];
+  const fp = c.fingerprint?.toLowerCase();
+  const matches = tokens.filter((t) => (c.prefix ? t.startsWith(c.prefix) : sha256(t).startsWith(fp!)));
+  if (matches.length === 0) return ["unknown", `no token on stdin matches this ${c.prefix ? "prefix" : "fingerprint"}`];
   if (matches.length > 1) return ["unknown", "more than one token on stdin matches this prefix"];
   return [await adapter(matches[0], ctx.fetch)];
 }
@@ -130,12 +141,12 @@ async function checkRecord(r: DecommissionRecord, source: CheckResult["source"],
   for (const c of todo) {
     const [status, note] = source === "live" ? await liveStatus(c, tokens, ctx) : [ctx.mockResponses[c.hash] ?? "dead"];
     const at = now.toISOString();
-    ctx.out(`  ${c.provider.padEnd(16)} ${c.type.padEnd(24)} ${c.prefix.padEnd(12)} ${status}${note ? ` (${note})` : ""}\n`);
+    ctx.out(`  ${c.provider.padEnd(16)} ${c.type.padEnd(24)} ${label(c).padEnd(12)} ${status}${note ? ` (${note})` : ""}\n`);
     // A flip is alive now after the last definite answer was dead; unknowns in between don't count.
     const last = history.findLast((h) => h.hash === c.hash && h.status !== "unknown");
     if (last?.status === "dead" && status === "alive") {
-      appendAlert(ctx.home, { at, agent: r.agent, window, source, provider: c.provider, type: c.type, prefix: c.prefix });
-      ctx.out(`  ALERT: ${c.provider} ${c.type} ${c.prefix} was dead at the ${last.window} check and is alive again.\n`);
+      appendAlert(ctx.home, { at, agent: r.agent, window, source, provider: c.provider, type: c.type, prefix: label(c) });
+      ctx.out(`  ALERT: ${c.provider} ${c.type} ${label(c)} was dead at the ${last.window} check and is alive again.\n`);
     }
     checks.push({ window, checkedAt: at, source, hash: c.hash, status });
   }
@@ -176,6 +187,59 @@ function report(args: string[], ctx: Context): number {
   return 0;
 }
 
+// Records each retired identity GhostGrant can check. One already recorded is left alone,
+// so importing the same inventory twice changes nothing.
+function importInventory(path: string | undefined, ctx: Context): number {
+  if (!path) {
+    ctx.err("Usage: ghostgrant import <inventory.json>\n");
+    return 1;
+  }
+  let bytes: Buffer;
+  try {
+    bytes = readFileSync(path);
+  } catch {
+    ctx.err(looksLikeSecret(path) ? "Can't read the inventory.\n" : `Can't read the inventory at ${path}.\n`);
+    return 1;
+  }
+  let inv;
+  try {
+    inv = parseInventory(bytes.toString("utf8"));
+  } catch (e) {
+    if (!(e instanceof InventoryError)) throw e;
+    ctx.err(`Inventory rejected: ${e.message} Nothing was recorded.\n`);
+    return 1;
+  }
+  const { records, skipped } = recordsFromInventory(inv, sha256(bytes), ctx.now());
+  for (const r of records) {
+    try {
+      const file = writeRecord(ctx.home, r);
+      ctx.out(`Recorded ${r.credentials.length} credential(s) for ${r.agent} (${r.inventory!.identity.id}) in ${file}\n`);
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code !== "EEXIST") throw e;
+      ctx.out(`Skipped ${r.inventory!.identity.id}: a decommission record for ${r.agent} already exists.\n`);
+    }
+  }
+  for (const s of skipped) ctx.out(`Skipped ${s}\n`);
+  if (records.length + skipped.length === 0) ctx.out("No retired identities in the inventory. Nothing was recorded.\n");
+  return 0;
+}
+
+function exportCmd(args: string[], ctx: Context): number {
+  const f = args.indexOf("--format");
+  if (f < 0 || args[f + 1] !== "inventory") {
+    ctx.err("Usage: ghostgrant export --format inventory [--mock]\n");
+    return 1;
+  }
+  const doc = exportInventory(loadRecords(ctx.home), args.includes("--mock") ? "mock" : "live", ctx.now(), version);
+  const e = validateInventory(doc);
+  if (e) {
+    ctx.err(`Export failed the inventory schema: ${e}. Nothing was written.\n`);
+    return 1;
+  }
+  ctx.out(JSON.stringify(doc, null, 2) + "\n");
+  return 0;
+}
+
 // Returns the process exit code. Kept free of process.exit so tests can call it.
 export async function run(argv: string[], ctx: Context = defaultContext): Promise<number> {
   const [cmd, ...rest] = argv;
@@ -190,6 +254,8 @@ export async function run(argv: string[], ctx: Context = defaultContext): Promis
   if (cmd === "decommission") return decommission(rest[0], ctx);
   if (cmd === "check") return check(rest, ctx);
   if (cmd === "report") return report(rest, ctx);
+  if (cmd === "import") return importInventory(rest[0], ctx);
+  if (cmd === "export") return exportCmd(rest, ctx);
   ctx.err(`Unknown command: ${cmd}\n\n${HELP}`);
   return 1;
 }

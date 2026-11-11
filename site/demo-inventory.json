@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "0.1",
+  "generatedAt": "2026-09-02T09:00:00.000Z",
+  "producer": {
+    "name": "ghost-grant",
+    "version": "0.0.0",
+    "url": "https://github.com/ai-automation-tools/ghost-grant"
+  },
+  "identities": [
+    {
+      "id": "ghost-grant:triage-bot",
+      "kind": "ai-agent",
+      "platform": "github",
+      "displayName": "triage-bot",
+      "status": "retired",
+      "retiredAt": "2026-06-01T09:00:00.000Z",
+      "credentials": [
+        {
+          "id": "github:ghp_FAKE:1",
+          "type": "personal-access-token",
+          "lastVerifiedDeadAt": "2026-08-30T09:00:00.000Z"
+        },
+        {
+          "id": "github:github_pat_FAKE:2",
+          "type": "other",
+          "lastVerifiedDeadAt": "2026-08-30T09:00:00.000Z"
+        },
+        {
+          "id": "github:gho_FAKE:3",
+          "type": "oauth-token",
+          "lastVerifiedDeadAt": "2026-08-30T09:00:00.000Z"
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "x": {
+    "ghost-grant": {
+      "source": "mock"
+    }
+  }
+}
