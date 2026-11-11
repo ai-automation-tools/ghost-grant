@@ -15,6 +15,9 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 
 ## Unreleased
 
+**Docs**
+- The README's related repositories table links CloakScan, the org's other agent-security tool.
+
 **Added**
 - Agent Security Suite inventory format (schema v0.1, vendored unedited in `schemas/`). `ghostgrant import <inventory.json>` records each retired GitHub, Slack, AWS or Okta identity and says why it skipped the rest; `check --live` pairs an imported credential with its stdin token by fingerprint. `ghostgrant export --format inventory` prints every record as an inventory: the latest dead answer as `lastVerifiedDeadAt`, a `critical` `ghost-grant/credential-still-live` finding for a credential that still answers alive, and other producers' findings and `x` keys unchanged. Every read and write is validated against the schema, and an invalid file exits non-zero naming the first error without quoting it. The demo page links its sample as `demo-inventory.json`. No new dependency: a small validator covers the keywords the schema uses. *After public release*
 - Slack adapter. `ghostgrant check --live` now asks Slack's `auth.test` for any `slack` credential with a matching token on stdin: `ok: true` is alive, `invalid_auth`, `token_revoked` or `account_inactive` is dead, and any other error, a 429, 5xx, timeout or non-JSON body is unknown. The token goes only in the `Authorization` header and is never printed or stored. *After public release*

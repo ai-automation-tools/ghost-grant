@@ -189,6 +189,7 @@ carries each credential's last dead answer as `lastVerifiedDeadAt`, and a critic
 | Repo | How it relates |
 |:---|:---|
 | [**ai-automation-tools**](https://github.com/ai-automation-tools) | The org this lives in. Its other tools are listed on the profile page. |
+| [**CloakScan**](https://github.com/ai-automation-tools/cloakscan) | Another agent-security tool in the org. GhostGrant checks that a retired agent's credentials stopped working; CloakScan checks the pages a live agent reads for hidden instructions. |
 
 ---
 
