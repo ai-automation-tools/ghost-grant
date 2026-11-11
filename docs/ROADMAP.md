@@ -1,23 +1,23 @@
 <h1 align="center">🗺️ Roadmap</h1>
 
 <p align="center">
-  <em>Everything between an empty CLI and a public, demoable GhostGrant, in the order it has to happen.</em>
+  <em>From a public, GitHub-first GhostGrant to scheduled re-checks, every provider the build plan names, and a first real user.</em>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/now-public_release-F59E0B?style=for-the-badge" alt="Now: public release">
-  <img src="https://img.shields.io/badge/stage-incubating-2ea44f?style=for-the-badge" alt="Stage: incubating">
+  <img src="https://img.shields.io/badge/now-fast--follow-F59E0B?style=for-the-badge" alt="Now: fast-follow">
+  <img src="https://img.shields.io/badge/stage-public_since_2026--11--03-2ea44f?style=for-the-badge" alt="Stage: public since 2026-11-03">
   <a href="README.md"><img src="https://img.shields.io/badge/↩-docs_home-6B7280?style=for-the-badge" alt="Back to docs"></a>
 </p>
 
 ---
 
-The Ghost-Grant Weekly Roadmap routine works this file top to bottom every Tuesday,
-Thursday and Saturday: it takes the first open item that isn't `🔒 Needs owner` (or up to six `small`
-ones), builds it, ticks it and opens a `roadmap/auto-<date>` PR. **Every item above `##
-After public release` is a release gate.** GhostGrant goes public when all of them are
-ticked and Mike says so. Ticking an item adds its line to the [changelog](CHANGELOG.md) and
-updates any doc it made stale, in the same commit.
+The GhostGrant roadmap routine (`ghost-grant-roadmap`) works this file top to bottom, one item
+per run, as `roadmap/auto-` PRs: it takes the first open item that isn't `🔒 Needs owner` (or up
+to six `small` ones), builds it and ticks it. **Every item above `## After public release` is a
+release gate;** all of them were ticked when GhostGrant went public on 2026-11-03. Ticking an
+item adds its line to the [changelog](CHANGELOG.md) and updates any doc it made stale, in the
+same commit.
 
 Markers: `- [ ]` open, `- [-]` claimed by a run in progress, `- [x]` done, `- [!]` blocked
 (the reason follows on the line). `small` marks docs or config a run can batch, up to six
@@ -62,7 +62,25 @@ is verified against mocked HTTP responses. No item needs a live credential.
 
 Nothing below blocks go-live.
 
+### 🛡️ Charter and scheduling
+
+- [ ] `small` **Responsible use.** A README section after "What it won't do": check only agents you retired and are authorised to test, `--live` sends each token once to its own provider and stores nothing, tokens never go in a manifest, a report isn't compliance evidence. Done when the section exists and the homepage resources link it.
+- [ ] **Exit code a scheduler can act on.** `ghostgrant check` exits 2 when the run writes a new ALERT (dead to alive), 0 otherwise, 1 on error; README › Re-checks and alerts documents it; tests cover a flip, a clean run and nothing due. Why: today `check` returns 0 even after `appendAlert` (`src/run.ts`), so cron or Cronsole can't notify on a flip.
+- [ ] **Cronsole catalog.** `scripts/build-registry.mjs` modelled on `edge-spectrum/site/scripts/build-registry.mjs`: Registry v1, pack `ghost-grant`, template `ghost-grant-recheck` (daily `ghostgrant check --live`, token env vars piped on stdin as task secrets), deterministic LF bytes + sha256 index, `--check` in CI, the daily Registry drift workflow, README link to each template's gallery page; mirrored into ghost-grant-site `/registry/` (add `*.json text eol=lf` there) with a Schedule it section. Needs the exit-code item first.
+- [ ] Add the `SITE_ORG_DEPLOY_KEY` secret so the catalog mirrors into ghost-grant-site. 🔒 Needs owner
+- [ ] Decide whether the Cronsole catalog also ships a weekly `ghostgrant report <agent> --json` template, or only the daily re-check. 🔒 Needs owner
+- [ ] **Pair live tokens by fingerprint.** `check --live` matches a stdin token to a manifest credential by its salted hash as well as its prefix, so a same-prefix token can't be sent for the wrong credential; tests cover two credentials sharing a prefix.
+- [ ] `small` **Actions and ESLint current.** checkout and setup-node v7, upload-pages-artifact v5, deploy-pages v5 (node24), ESLint 10; lint, test, build and the Pages deploy green; `docs/UPSTREAMS.md` pins updated. Touches `.github/workflows/`, so the PR waits for review.
+
+### 🖥️ Demo
+
+- [ ] **Stamp the demo build** *(Homepage refresh, 2026-11-09)* — **What:** add a `<meta name="build" content="<sha>">` tag to the demo's page, set to the commit SHA at deploy time, as Incubate's boilerplate does. `Get-SurfaceDrift.py` finds no build stamp on https://ghost-grant-demo.ai-automation-tools.dev/, so a stale deploy can't be told from a current one. **Done when:** `Get-SurfaceDrift.py` shows the ghost-grant demo `current` after a deploy.
+- [ ] `small` **Demo shows Slack too.** Add a fictional Slack bot token to `site/demo-record.json` (still exactly one flip), regenerate `demo-report.json` and `demo-inventory.json`; the demo test passes.
+- [ ] `small` **Demo in house style.** A Light/Dark switch (`ghost-grant.theme`, no flash) and a footer linking the homepage and ai-automation-tools.dev.
+
 ### 🧩 Fast-follow slices
+
+- [ ] Decide whether Slack's `token_expired` counts as dead (`docs/OPEN-QUESTIONS.md`, asked 2026-11-03); yes is a one-word change to `SLACK_DEAD` with one test. 🔒 Needs owner
 
 - [x] **Slice 2: Slack adapter.** Same shape as Slice 1, calling `auth.test`: `ok: true` is alive, `invalid_auth`/`token_revoked`/`account_inactive` are dead, anything else is unknown. Mocked tests for each, and the adapter interface from Slice 1 holds without changes (or the PR says what changed and why). — done 2026-11-03 by ghost-grant-roadmap: `slack` in `src/adapters.ts` POSTs `auth.test` with a bearer header; the `Adapter` type is unchanged, the timeout wrapper is now shared with `github`; 66 tests
 - [x] **Agent Security Suite inventory format.** Read and write the suite's shared format, [agent inventory schema v0.1](https://ai-automation-tools.dev/schemas/agent-inventory/v0.1.json) (vendor it to `schemas/agent-inventory.schema.json`, never edit the copy). `ghost-grant import <inventory.json>` takes the identities with `status: "retired"` and their `credentials[]` (fingerprints only) as the check list; each re-check writes `lastVerifiedDeadAt` on a dead credential and a finding with `ruleId` `ghost-grant/credential-still-live` (severity `critical`) for a live one; `ghost-grant export --format inventory` writes a schema-valid document. Every read and write is validated against the schema, an invalid file exits non-zero naming the first error, another producer's `x` keys round-trip unchanged, and the demo can download its sample as an inventory. Why: other suite tools (an MCP config scanner, a granted-versus-used trimmer) emit this format, so a retired agent found by one can be proven dead by this one without re-keying. — done 2026-11-10 by ghost-grant-roadmap: `ghostgrant import` / `ghostgrant export --format inventory` (the bin is `ghostgrant`; `ghost-grant` is the producer name) in `src/inventory.ts`, validated by a small in-repo validator for the schema's keywords; `lastVerifiedDeadAt` and findings come from the record's checks at export; imported credentials pair live tokens by fingerprint; demo links `demo-inventory.json`; 83 tests
@@ -72,12 +90,17 @@ Nothing below blocks go-live.
 - [ ] **Alert delivery (spec: Should).** A flip alert can also go to a webhook URL from config. Slack and email come after that, if anyone asks.
 - [ ] **`--watch` mode and CSV export (spec: Could).** Only if real users ask for them.
 
+### 📚 Docs and agents
+
+- [ ] **Re-check lifecycle diagram.** An Archify lifecycle diagram in `docs/diagrams/` (decommission → 24h/7d/30d/90d → clean / dead-so-far / flipped / unknown), code-pinned to `src/run.ts`, with a builder `--check`; embedded on the homepage in Live mode.
+- [ ] **Agent skill.** `skills/ghostgrant/SKILL.md`: decommission a retired agent's manifest, run check, read the report verdicts; installable with `npx skills add ai-automation-tools/ghost-grant`.
+
 ### 📣 Publish and promote
 
 - [ ] Hand the tool to one real security or platform engineer at a small company and write down whether they'd run it. This is the build plan's checkpoint for the memo's key assumption. 🔒 Needs owner
 - [ ] Tag v0.1 and publish the CLI to npm as `ghostgrant` (check the name is still free first). 🔒 Needs owner
 - [ ] Launch post with one real example report, sent to the two or three places platform engineers running AI agents read. 🔒 Needs owner
-- [ ] Custom subdomain `ghost-grant.ai-automation-tools.dev`. 🔒 Needs owner
+- [x] Custom subdomain `ghost-grant.ai-automation-tools.dev`. 🔒 Needs owner — done 2026-11-03: graduation put the homepage there (ghost-grant-site) and the demo on ghost-grant-demo.
 - [ ] Twelve weeks after v0.1, check the falsifier: under 20 stars and 2 or fewer unprompted issues means stop adding providers and rethink. 🔒 Needs owner
 
 ### 💰 Revenue

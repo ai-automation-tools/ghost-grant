@@ -16,6 +16,8 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 ## Unreleased
 
 **Docs**
+- Roadmap rechecked against the org's 2026-11 requirements. The intro names the routine instead of its days and the badges say public. New groups: Charter and scheduling (Responsible use, a `check` exit code a scheduler can act on ahead of a Cronsole catalog, fingerprint pairing for live tokens, current Actions and ESLint), Demo (build stamp, Slack, house style) and Docs and agents (a re-check lifecycle diagram, an agent skill). Owner questions on Slack `token_expired` and a weekly report template are queued as `🔒 Needs owner` items.
+- Custom subdomain ticked: since graduation the homepage serves at `https://ghost-grant.ai-automation-tools.dev/` (ghost-grant-site) and the demo at `https://ghost-grant-demo.ai-automation-tools.dev/`. *Publish and promote*
 - The README's related repositories table links CloakScan, the org's other agent-security tool.
 
 **Added**
