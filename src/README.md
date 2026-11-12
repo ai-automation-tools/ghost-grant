@@ -14,9 +14,10 @@
 | File | What it does |
 |:---|:---|
 | [**cli.ts**](cli.ts) | The `ghostgrant` bin entry. Hands `argv` to `run()` and sets the exit code. |
-| [**run.ts**](run.ts) | Command dispatch and the `decommission`, `check` and `report` commands, including which credentials are due and flip detection. Takes a context (output, records directory, clock, canned mock responses, `fetch`, and the stdin token reader for `--live`) instead of reaching for `process`, so tests can call it. |
+| [**run.ts**](run.ts) | Command dispatch and the `decommission`, `import`, `check`, `report` and `export` commands, including which credentials are due and flip detection. Takes a context (output, records directory, clock, canned mock responses, `fetch`, and the stdin token reader for `--live`) instead of reaching for `process`, so tests can call it. |
 | [**adapters.ts**](adapters.ts) | One read-only check per provider: token in, `alive`, `dead` or `unknown` out. GitHub (`GET /user`) and Slack (`auth.test`) so far. |
 | [**manifest.ts**](manifest.ts) | Parses and validates a manifest, and refuses anything shaped like a raw secret without echoing it. |
+| [**inventory.ts**](inventory.ts) | The Agent Security Suite inventory: a validator for the vendored schema, turning retired identities into records, and turning records back into an inventory with `lastVerifiedDeadAt` and still-live findings. |
 | [**report.ts**](report.ts) | The `Report` type (the one JSON shape, shared with the demo), building one from a record's checks, and the plain-text layout. |
 | [**records.ts**](records.ts) | The re-check windows, and reading and writing decommission records (with their check results) and the alert log under `$GHOSTGRANT_HOME`. |
 

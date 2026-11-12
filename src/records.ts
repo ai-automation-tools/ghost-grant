@@ -1,6 +1,7 @@
 import { appendFileSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Status } from "./adapters.ts";
+import type { ImportedFrom } from "./inventory.ts";
 import type { Credential } from "./manifest.ts";
 
 // When each check is due, measured from the decommission time. "initial" is the first
@@ -30,6 +31,7 @@ export type DecommissionRecord = {
   manifestSha256: string;
   credentials: Credential[];
   checks?: CheckResult[]; // append-only, oldest first
+  inventory?: ImportedFrom; // set by ghostgrant import
 };
 
 export type Alert = {

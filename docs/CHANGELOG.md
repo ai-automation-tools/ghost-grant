@@ -15,7 +15,13 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 
 ## Unreleased
 
+**Docs**
+- Roadmap rechecked against the org's 2026-11 requirements. The intro names the routine instead of its days and the badges say public. New groups: Charter and scheduling (Responsible use, a `check` exit code a scheduler can act on ahead of a Cronsole catalog, fingerprint pairing for live tokens, current Actions and ESLint), Demo (build stamp, Slack, house style) and Docs and agents (a re-check lifecycle diagram, an agent skill). Owner questions on Slack `token_expired` and a weekly report template are queued as `🔒 Needs owner` items.
+- Custom subdomain ticked: since graduation the homepage serves at `https://ghost-grant.ai-automation-tools.dev/` (ghost-grant-site) and the demo at `https://ghost-grant-demo.ai-automation-tools.dev/`. *Publish and promote*
+- The README's related repositories table links CloakScan, the org's other agent-security tool.
+
 **Added**
+- Agent Security Suite inventory format (schema v0.1, vendored unedited in `schemas/`). `ghostgrant import <inventory.json>` records each retired GitHub, Slack, AWS or Okta identity and says why it skipped the rest; `check --live` pairs an imported credential with its stdin token by fingerprint. `ghostgrant export --format inventory` prints every record as an inventory: the latest dead answer as `lastVerifiedDeadAt`, a `critical` `ghost-grant/credential-still-live` finding for a credential that still answers alive, and other producers' findings and `x` keys unchanged. Every read and write is validated against the schema, and an invalid file exits non-zero naming the first error without quoting it. The demo page links its sample as `demo-inventory.json`. No new dependency: a small validator covers the keywords the schema uses. *After public release*
 - Slack adapter. `ghostgrant check --live` now asks Slack's `auth.test` for any `slack` credential with a matching token on stdin: `ok: true` is alive, `invalid_auth`, `token_revoked` or `account_inactive` is dead, and any other error, a 429, 5xx, timeout or non-JSON body is unknown. The token goes only in the `Authorization` header and is never printed or stored. *After public release*
 - `docs/UPSTREAMS.md` and `.github/dependabot.yml`: the upstream worklist for the biweekly upstream check, and weekly grouped minor/patch Dependabot updates for npm and GitHub Actions.
 - Release gate *Live demo* ticked: the demo serves at `https://ghost-grant-demo.ai-automation-tools.dev/` (the old `ai-automation-tools.dev/ghost-grant/` path redirects there). *Public release*

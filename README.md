@@ -65,8 +65,9 @@ It is a local CLI. There's no GhostGrant server, no account, and no telemetry.
 | **Slack adapter** | ✅ `check --live` asks Slack's `auth.test`. `ok: true` is alive; `invalid_auth`, `token_revoked` or `account_inactive` is dead; any other error, a 429, 5xx or timeout is unknown. |
 | **Re-check windows and flip alerts** | ✅ Each `check` runs the window that's due (at decommission, then 24h, 7d, 30d, 90d) and skips records with nothing due. Dead-to-alive prints an `ALERT` and goes to `alerts.log`. |
 | **`ghostgrant report <agent>`** | ✅ A dated plain-text report of every check for one agent and what it found, or the same data with `--json`. [Reports](#-reports) |
+| **Agent Security Suite inventories** | ✅ `ghostgrant import <inventory.json>` records every retired identity in the suite's shared format; `ghostgrant export --format inventory` writes the checks back as `lastVerifiedDeadAt` and `critical` findings. Both validate against the vendored schema. [Inventory format](docs/inventory.md) |
 | **AWS IAM, Okta, Google Workspace** | Slices 5 to 7 |
-| **Static demo dashboard** | ✅ `site/` renders a bundled report for a fictional agent (GitHub credentials, every window, one flip) with the CLI's own `Report` type. `npm run build` writes it to `_site/site/`, and the Pages workflow publishes it to [ghost-grant-demo.ai-automation-tools.dev](https://ghost-grant-demo.ai-automation-tools.dev/) on every push to `main` |
+| **Static demo dashboard** | ✅ `site/` renders a bundled report for a fictional agent (GitHub credentials, every window, one flip) with the CLI's own `Report` type. `npm run build` writes it to `_site/site/`, and the Pages workflow publishes it to [ghost-grant-demo.ai-automation-tools.dev](https://ghost-grant-demo.ai-automation-tools.dev/) on every push to `main`. The page links the same sample as a downloadable inventory |
 
 ## 🚫 What it won't do
 
@@ -152,6 +153,23 @@ The last line says what the checks add up to:
 what was checked and what each provider answered, nothing more: it isn't signed, and it
 isn't compliance evidence.
 
+## 🧩 Suite inventories
+
+Other Agent Security Suite tools write the same
+[agent inventory format](https://ai-automation-tools.dev/schemas/agent-inventory/v0.1.json),
+so a retired agent one of them found can be checked here without writing a manifest:
+
+```bash
+node dist/cli.js import inventory.json                          # records each retired identity
+node dist/cli.js check --mock
+node dist/cli.js export --format inventory --mock > checked.json
+```
+
+Imported credentials pair with stdin tokens by fingerprint in `check --live`. The export
+carries each credential's last dead answer as `lastVerifiedDeadAt`, and a critical
+`ghost-grant/credential-still-live` finding for any that still answers alive. Details in
+[docs/inventory.md](docs/inventory.md).
+
 ## 🗂️ What's in here
 
 | Folder | What's inside |
@@ -159,6 +177,7 @@ isn't compliance evidence.
 | [**📚 docs/**](docs/README.md) | The roadmap, the changelog, and the product spec and build plan. |
 | [**🧰 src/**](src/README.md) | The CLI source. |
 | [**📝 examples/**](examples/manifest.yaml) | A sample manifest for a fictional agent, used in the quick start. |
+| [**🧩 schemas/**](schemas/agent-inventory.schema.json) | The Agent Security Suite inventory schema v0.1, vendored unedited. Import and export validate against it. |
 | [**🖥️ site/**](site/app.ts) | The static demo page: a bundled report for a fictional agent, rendered with the `Report` type from `src/`. |
 | [**🧪 tests/**](tests/cli.test.ts) | Tests for `node --test`, run straight from TypeScript. |
 | [**🔒 SECURITY.md**](SECURITY.md) | How to report a vulnerability, and why every token-shaped fixture here is fake. |
@@ -170,6 +189,7 @@ isn't compliance evidence.
 | Repo | How it relates |
 |:---|:---|
 | [**ai-automation-tools**](https://github.com/ai-automation-tools) | The org this lives in. Its other tools are listed on the profile page. |
+| [**CloakScan**](https://github.com/ai-automation-tools/cloakscan) | Another agent-security tool in the org. GhostGrant checks that a retired agent's credentials stopped working; CloakScan checks the pages a live agent reads for hidden instructions. |
 
 ---
 

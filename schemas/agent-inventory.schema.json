@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-automation-tools.dev/schemas/agent-inventory/v0.1.json",
+  "title": "Agent Inventory",
+  "description": "v0.1 (draft, 2026-11-05). One exchange format for the ai-automation-tools Agent Security Suite: the non-human identities (AI agents, service accounts, bots, CI jobs, MCP servers, OAuth apps) a tool found, what each holds and uses, and what the tool concluded. Secret values are never stored: credentials carry a fingerprint only.",
+  "type": "object",
+  "required": ["schemaVersion", "generatedAt", "producer", "identities"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": "0.1" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "producer": {
+      "description": "The tool that wrote this document.",
+      "type": "object",
+      "required": ["name", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "examples": ["ghost-grant", "scope-drift-trimmer", "mcp-frisk"] },
+        "version": { "type": "string" },
+        "url": { "type": "string", "format": "uri" }
+      }
+    },
+    "identities": { "type": "array", "items": { "$ref": "#/$defs/identity" } },
+    "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } },
+    "x": { "description": "Producer-specific extension data. Consumers ignore what they don't know.", "type": "object" }
+  },
+  "$defs": {
+    "timestamp": { "type": ["string", "null"], "format": "date-time" },
+    "identity": {
+      "type": "object",
+      "required": ["id", "kind", "platform", "displayName", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "description": "Stable across runs and tools: '<platform>:<native id>', e.g. 'github:app/12345', 'aws:arn:aws:iam::123456789012:role/ci-deploy'.", "type": "string", "pattern": "^[a-z0-9-]+:.+$" },
+        "kind": { "enum": ["ai-agent", "service-account", "bot", "ci-job", "mcp-server", "oauth-app", "workload", "other"] },
+        "platform": { "enum": ["github", "aws", "azure-entra", "okta", "gcp", "slack", "scim", "mcp", "identityiq", "local", "other"] },
+        "displayName": { "type": "string" },
+        "owner": {
+          "description": "The accountable human or team. Missing or unreachable owner is itself a finding (orphaned identity).",
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "team": { "type": "string" },
+            "verifiedAt": { "$ref": "#/$defs/timestamp" }
+          }
+        },
+        "status": { "enum": ["active", "disabled", "retired", "unknown"] },
+        "createdAt": { "$ref": "#/$defs/timestamp" },
+        "lastUsedAt": { "$ref": "#/$defs/timestamp" },
+        "retiredAt": { "$ref": "#/$defs/timestamp" },
+        "credentials": { "type": "array", "items": { "$ref": "#/$defs/credential" } },
+        "grants": { "type": "array", "items": { "$ref": "#/$defs/grant" } },
+        "tools": { "type": "array", "items": { "$ref": "#/$defs/tool" } },
+        "tags": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "credential": {
+      "type": "object",
+      "required": ["id", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "enum": ["api-key", "oauth-token", "personal-access-token", "access-key", "certificate", "ssh-key", "password", "session", "other"] },
+        "fingerprint": { "description": "First 12 hex chars of SHA-256 of the secret, or the platform's own key id. Never the secret.", "type": "string", "pattern": "^[A-Za-z0-9:_-]{4,64}$" },
+        "location": { "enum": ["env-file", "os-keychain", "vault", "config-file", "ci-secret", "platform", "unknown"] },
+        "createdAt": { "$ref": "#/$defs/timestamp" },
+        "expiresAt": { "$ref": "#/$defs/timestamp" },
+        "rotatedAt": { "$ref": "#/$defs/timestamp" },
+        "lastUsedAt": { "$ref": "#/$defs/timestamp" },
+        "revokedAt": { "$ref": "#/$defs/timestamp" },
+        "lastVerifiedDeadAt": { "description": "Last time a tool confirmed the credential is rejected by the platform (GhostGrant's check).", "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "grant": {
+      "description": "One permission the identity holds. 'lastUsedAt' null with 'usageKnown' true means held but never used in the observation window.",
+      "type": "object",
+      "required": ["id", "resource", "permission"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "resource": { "description": "What the permission applies to, e.g. 'repo:acme/api', 'aws:s3:*', 'graph:User.ReadWrite.All'.", "type": "string" },
+        "permission": { "description": "The platform's own scope or action name.", "type": "string" },
+        "access": { "enum": ["read", "write", "admin", "execute", "other"] },
+        "grantedAt": { "$ref": "#/$defs/timestamp" },
+        "grantedBy": { "type": "string" },
+        "lastUsedAt": { "$ref": "#/$defs/timestamp" },
+        "usageKnown": { "type": "boolean", "default": false },
+        "observationDays": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "tool": {
+      "description": "A tool or MCP server the identity can call, with the capabilities that matter for separation of duties.",
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "server": { "type": "string" },
+        "capabilities": {
+          "type": "array",
+          "items": { "enum": ["read-secrets", "network-egress", "write-code", "execute-shell", "read-private-data", "send-message", "modify-iam", "spend-money", "deploy", "other"] }
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": ["id", "identityId", "ruleId", "severity", "title"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "identityId": { "type": "string" },
+        "ruleId": { "description": "'<producer>/<rule>', e.g. 'scope-drift-trimmer/unused-grant', 'ghost-grant/credential-still-live'.", "type": "string" },
+        "severity": { "enum": ["critical", "high", "medium", "low", "info"] },
+        "title": { "type": "string" },
+        "evidence": { "type": "string" },
+        "remediation": { "description": "A draft change for a human to review and run. Tools in the suite never apply it themselves.", "type": "string" },
+        "status": { "enum": ["open", "accepted-risk", "fixed", "false-positive"], "default": "open" },
+        "references": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}
