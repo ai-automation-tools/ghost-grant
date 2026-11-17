@@ -62,6 +62,17 @@ Prints every record as one schema-valid inventory on stdout, so
 The [demo page](https://ghost-grant-demo.ai-automation-tools.dev/) links its sample as an
 inventory, `site/demo-inventory.json`, which is this export of the demo record.
 
+## Use it with ASCC
+
+[AI Security Command Center](https://github.com/ai-automation-tools/ai-security-command-center) merges another suite tool's inventory into its own:
+
+```bash
+ghostgrant export --format inventory > ghost-grant.json
+ascc inventory --import ghost-grant.json --out inventory.json
+```
+
+The retired identities and their credentials are added, tagged `imported-from:ghost-grant`. An identity ASCC's registry already declares is kept as it is, and GhostGrant's findings are not carried over, so read them in `ghost-grant.json`.
+
 ---
 
 <p align="center">
