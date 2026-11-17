@@ -190,6 +190,7 @@ carries each credential's last dead answer as `lastVerifiedDeadAt`, and a critic
 |:---|:---|
 | [**ai-automation-tools**](https://github.com/ai-automation-tools) | The org this lives in. Its other tools are listed on the profile page. |
 | [**CloakScan**](https://github.com/ai-automation-tools/cloakscan) | Another agent-security tool in the org. GhostGrant checks that a retired agent's credentials stopped working; CloakScan checks the pages a live agent reads for hidden instructions. |
+| [**AI Security Command Center**](https://github.com/ai-automation-tools/ai-security-command-center) | The suite's enforcing tool: a Claude Code hook that asks Cedar policy before each tool call. `ascc inventory --import` reads GhostGrant's inventory export, so the retired identities you check here show up in its inventory. See [Inventory format](docs/inventory.md#use-it-with-ascc). |
 
 ---
 
