@@ -83,6 +83,20 @@ These are out of scope on purpose, so please don't open an issue asking for them
 - **Support providers beyond the five.** GitHub, Slack, AWS IAM, Okta and Google Workspace,
   and nothing else this version.
 
+## 🤝 Responsible use
+
+- **Check only what's yours.** Point GhostGrant at agents you retired, using credentials you
+  are authorised to test. Asking a provider whether someone else's token works isn't what
+  it's for.
+- **`--live` sends each token once, to its own provider, and stores nothing.** A token you
+  pipe in goes to the one provider whose credential it matches, for that run only. It never
+  reaches a record, a report, a log line or an error message.
+- **Tokens never go in a manifest.** A manifest names each credential by provider, type, a
+  visible prefix and a salted hash. `decommission` refuses anything that looks like a raw
+  token, without echoing it. [Manifest format](docs/manifest.md)
+- **A report isn't compliance evidence.** It says what was checked and what each provider
+  answered, on the dates it ran. It isn't signed, attested or audit-grade.
+
 ## 🚀 Quick start
 
 ```bash

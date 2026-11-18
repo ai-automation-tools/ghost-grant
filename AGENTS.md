@@ -31,7 +31,7 @@ Full spec: `docs/product/spec.md`. Slice order: `docs/product/build-plan.md`. Wo
 - HTTP: Node's built-in `fetch`. Mock it in tests by injecting the fetch function into each
   adapter, or with `nock`/`msw` if injection gets awkward (say which in the PR).
 - Tests: `node:test` and `node:assert/strict`, files in `tests/*.test.ts`. No Jest, no Vitest.
-- Lint: ESLint 9 flat config with `typescript-eslint` recommended, plus `tsc --noEmit`.
+- Lint: ESLint 10 flat config with `typescript-eslint` recommended, plus `tsc --noEmit`.
 - `src/cli.ts` is the bin entry; logic goes in modules that take their inputs as arguments
   (including the clock and the fetch function) so tests can call them without a process,
   a network, or real time passing.
