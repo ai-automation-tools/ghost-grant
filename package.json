@@ -22,11 +22,11 @@
     "build:site": "tsc -p site/tsconfig.json && node -e \"for (const f of ['index.html', 'demo-report.json', 'demo-inventory.json', 'favicon.svg']) require('fs').cpSync('site/' + f, '_site/site/' + f)\""
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.5",
+    "@eslint/js": "^10.0.1",
     "@types/node": "^22.20.4",
-    "eslint": "^9.39.5",
+    "eslint": "^10.15.0",
     "typescript": "~6.0",
-    "typescript-eslint": "^8.72.1"
+    "typescript-eslint": "^8.73.0"
   },
   "dependencies": {
     "yaml": "^2.9.1"
