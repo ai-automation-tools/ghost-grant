@@ -62,7 +62,7 @@ It is a local CLI. There's no GhostGrant server, no account, and no telemetry.
 | **`ghostgrant decommission <manifest>`** | ✅ Records a decommission entry with a timestamp and the manifest's checksum. [Manifest format](docs/manifest.md) |
 | **`ghostgrant check --mock`** | ✅ Runs every check that's due against canned responses and prints alive/dead |
 | **`ghostgrant check --live`** | ✅ GitHub: asks `GET /user` with each token you pipe in. 200 is alive, 401 is dead, a timeout, 5xx or rate limit is unknown. [Live checks](#-live-checks) |
-| **Slack adapter** | ✅ `check --live` asks Slack's `auth.test`. `ok: true` is alive; `invalid_auth`, `token_revoked` or `account_inactive` is dead; any other error, a 429, 5xx or timeout is unknown. |
+| **Slack adapter** | ✅ `check --live` asks Slack's `auth.test`. `ok: true` is alive; `invalid_auth`, `token_revoked`, `token_expired` or `account_inactive` is dead; any other error, a 429, 5xx or timeout is unknown. |
 | **Re-check windows and flip alerts** | ✅ Each `check` runs the window that's due (at decommission, then 24h, 7d, 30d, 90d) and skips records with nothing due. Dead-to-alive prints an `ALERT` and goes to `alerts.log`. |
 | **`ghostgrant report <agent>`** | ✅ A dated plain-text report of every check for one agent and what it found, or the same data with `--json`. [Reports](#-reports) |
 | **Agent Security Suite inventories** | ✅ `ghostgrant import <inventory.json>` records every retired identity in the suite's shared format; `ghostgrant export --format inventory` writes the checks back as `lastVerifiedDeadAt` and `critical` findings. Both validate against the vendored schema. [Inventory format](docs/inventory.md) |

@@ -49,7 +49,7 @@ export const github: Adapter = (token, fetchFn, timeoutMs = TIMEOUT_MS) =>
 
 // The Slack errors that mean the token itself no longer works. Every other error
 // (ratelimited, fatal_error, missing_scope, ...) says nothing about the token: unknown.
-const SLACK_DEAD = new Set(["invalid_auth", "token_revoked", "account_inactive"]);
+const SLACK_DEAD = new Set(["invalid_auth", "token_revoked", "token_expired", "account_inactive"]);
 
 // auth.test is Slack's whoami and changes nothing. Slack answers HTTP 200 for most
 // failures, so the verdict comes from the body: `ok: true` is alive, a dead error is dead.
