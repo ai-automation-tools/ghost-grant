@@ -16,6 +16,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 ## Unreleased
 
 **Docs**
+- Roadmap: the catalog question is decided (2026-11-22, Mike). The Cronsole catalog ships a weekly `ghostgrant report <agent> --json` template beside the daily re-check.
 - README › Responsible use: check only agents you retired and may test, `--live` sends each token once to its own provider and stores nothing, tokens never go in a manifest, and a report isn't compliance evidence.
 - The docs hub links `docs/UPSTREAMS.md`, which no page linked before.
 - Roadmap rechecked against the org's 2026-11 requirements. The intro names the routine instead of its days and the badges say public. New groups: Charter and scheduling (Responsible use, a `check` exit code a scheduler can act on ahead of a Cronsole catalog, fingerprint pairing for live tokens, current Actions and ESLint), Demo (build stamp, Slack, house style) and Docs and agents (a re-check lifecycle diagram, an agent skill). Owner questions on Slack `token_expired` and a weekly report template are queued as `🔒 Needs owner` items.
