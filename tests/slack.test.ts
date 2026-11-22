@@ -13,6 +13,7 @@ for (const [name, fetchFn, want] of [
   ["invalid_auth is dead", answering({ ok: false, error: "invalid_auth" }), "dead"],
   ["token_revoked is dead", answering({ ok: false, error: "token_revoked" }), "dead"],
   ["account_inactive is dead", answering({ ok: false, error: "account_inactive" }), "dead"],
+  ["token_expired is dead", answering({ ok: false, error: "token_expired" }), "dead"],
   ["another error is unknown", answering({ ok: false, error: "fatal_error" }), "unknown"],
   ["ok: false with no error is unknown", answering({ ok: false }), "unknown"],
   ["a 200 ratelimited body is unknown", answering({ ok: false, error: "ratelimited" }), "unknown"],
