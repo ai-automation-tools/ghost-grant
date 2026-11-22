@@ -16,6 +16,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 ## Unreleased
 
 **Docs**
+- README › Responsible use: check only agents you retired and may test, `--live` sends each token once to its own provider and stores nothing, tokens never go in a manifest, and a report isn't compliance evidence.
 - The docs hub links `docs/UPSTREAMS.md`, which no page linked before.
 - Roadmap rechecked against the org's 2026-11 requirements. The intro names the routine instead of its days and the badges say public. New groups: Charter and scheduling (Responsible use, a `check` exit code a scheduler can act on ahead of a Cronsole catalog, fingerprint pairing for live tokens, current Actions and ESLint), Demo (build stamp, Slack, house style) and Docs and agents (a re-check lifecycle diagram, an agent skill). Owner questions on Slack `token_expired` and a weekly report template are queued as `🔒 Needs owner` items.
 - Custom subdomain ticked: since graduation the homepage serves at `https://ghost-grant.ai-automation-tools.dev/` (ghost-grant-site) and the demo at `https://ghost-grant-demo.ai-automation-tools.dev/`. *Publish and promote*
@@ -23,6 +24,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 - The README's related repositories table links AI Security Command Center, and the inventory format page shows how its `export --format inventory` output reaches `ascc inventory --import`.
 
 **Changed**
+- ESLint 10 (`eslint` 10.15, `@eslint/js` 10.0, `typescript-eslint` 8.73), and the workflows on `actions/checkout@v7`, `actions/setup-node@v7`, `actions/upload-pages-artifact@v5` and `actions/deploy-pages@v5` (Node 24 runtime). `docs/UPSTREAMS.md` pins match.
 - Slack's `token_expired` now counts as dead, as Mike decided on 2026-11-16: a token Slack refuses as expired no longer keeps a report from coming back clean. Slack's `auth.test` docs list the error as "Authentication token has expired." *After public release*
 
 **Added**
