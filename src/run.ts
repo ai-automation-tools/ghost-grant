@@ -38,7 +38,8 @@ Usage:
   ghostgrant --help                         Print this help
 
 Checks fall due at decommission, then 24h, 7d, 30d and 90d after it. A credential that
-goes from dead to alive is printed as an ALERT and logged to $GHOSTGRANT_HOME/alerts.log.
+goes from dead to alive is printed as an ALERT and logged to $GHOSTGRANT_HOME/alerts.log,
+and check exits 2 (0 when no new alert, 1 on error).
 Records are kept in $GHOSTGRANT_HOME (default ~/.ghostgrant).
 `;
 
@@ -124,7 +125,8 @@ async function liveStatus(c: Credential, tokens: string[], ctx: Context): Promis
 
 // Checks every credential the record's latest due window hasn't settled yet. A settled
 // credential has an alive or dead answer for that window; unknown gets asked again next run.
-async function checkRecord(r: DecommissionRecord, source: CheckResult["source"], tokens: string[], ctx: Context) {
+// Returns how many alerts it wrote.
+async function checkRecord(r: DecommissionRecord, source: CheckResult["source"], tokens: string[], ctx: Context): Promise<number> {
   const now = ctx.now();
   const window = dueWindow(r, now);
   const history = (r.checks ?? []).filter((c) => c.source === source);
@@ -134,10 +136,11 @@ async function checkRecord(r: DecommissionRecord, source: CheckResult["source"],
   if (!window || todo.length === 0) {
     const next = nextWindow(r, now);
     ctx.out(`\n${r.agent}: nothing due. ${next ? `Next check (${next.window}) at ${next.dueAt}.` : "Every window has been checked."}\n`);
-    return;
+    return 0;
   }
   ctx.out(`\n${r.agent} (decommissioned ${r.decommissionedAt}), ${window} check\n`);
   const checks = [...(r.checks ?? [])];
+  let alerts = 0;
   for (const c of todo) {
     const [status, note] = source === "live" ? await liveStatus(c, tokens, ctx) : [ctx.mockResponses[c.hash] ?? "dead"];
     const at = now.toISOString();
@@ -147,10 +150,12 @@ async function checkRecord(r: DecommissionRecord, source: CheckResult["source"],
     if (last?.status === "dead" && status === "alive") {
       appendAlert(ctx.home, { at, agent: r.agent, window, source, provider: c.provider, type: c.type, prefix: label(c) });
       ctx.out(`  ALERT: ${c.provider} ${c.type} ${label(c)} was dead at the ${last.window} check and is alive again.\n`);
+      alerts++;
     }
     checks.push({ window, checkedAt: at, source, hash: c.hash, status });
   }
   saveRecord(ctx.home, { ...r, checks });
+  return alerts;
 }
 
 async function check(flags: string[], ctx: Context): Promise<number> {
@@ -167,8 +172,10 @@ async function check(flags: string[], ctx: Context): Promise<number> {
   }
   const tokens = live ? await ctx.readSecrets() : [];
   ctx.out(live ? "Live mode: asking each provider. Tokens are not stored.\n" : "Mock mode: canned responses, no provider was called.\n");
-  for (const r of records) await checkRecord(r, live ? "live" : "mock", tokens, ctx);
-  return 0;
+  let alerts = 0;
+  for (const r of records) alerts += await checkRecord(r, live ? "live" : "mock", tokens, ctx);
+  // 2 tells a scheduler this run wrote a new ALERT; 1 stays for errors.
+  return alerts > 0 ? 2 : 0;
 }
 
 function report(args: string[], ctx: Context): number {
