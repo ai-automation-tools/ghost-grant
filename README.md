@@ -145,6 +145,17 @@ A credential whose last definite answer was dead and now answers alive prints an
 line and adds one JSON line to `$GHOSTGRANT_HOME/alerts.log`. Mock and live answers are kept
 apart, so a canned answer never counts as a real check.
 
+`ghostgrant check` exits so a scheduler can act on it:
+
+| Exit code | Meaning |
+|---|---|
+| `0` | No new alert: everything due was checked, or nothing was due |
+| `1` | Error, such as a missing `--mock`/`--live` flag |
+| `2` | This run wrote at least one new `ALERT` |
+
+A credential that stays alive after its flip alerts once, so the next run is back to `0`.
+Any non-zero exit is worth a notification: `2` is a flip, `1` means the check didn't run.
+
 ## 📄 Reports
 
 `ghostgrant report <agent>` prints every live check for one agent: each credential, each

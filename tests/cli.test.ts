@@ -283,12 +283,19 @@ test("a missed window is skipped for the latest one that's due", async () => {
 test("a dead credential that comes back alive raises exactly one alert", async () => {
   const s = sandbox();
   await s.exec(["decommission", s.write("m.yaml", VALID)]);
-  assert.doesNotMatch((await s.exec(["check", "--mock"])).out, /ALERT/);
+  const clean = await s.exec(["check", "--mock"]);
+  assert.doesNotMatch(clean.out, /ALERT/);
+  assert.equal(clean.code, 0, "a clean run exits 0");
   const flipped = await s.exec(["check", "--mock"], { now: at(25), mockResponses: { [HASH_A]: "alive" } });
   assert.match(flipped.out, /ALERT: github personal-access-token ghp_FAKE was dead at the initial check and is alive again\./);
+  assert.equal(flipped.code, 2, "a run that writes a new alert exits 2");
   // Still alive a week later: no new flip, so no new alert.
   const still = await s.exec(["check", "--mock"], { now: at(7 * 24), mockResponses: { [HASH_A]: "alive" } });
   assert.doesNotMatch(still.out, /ALERT/);
+  assert.equal(still.code, 0, "an old flip doesn't keep the exit code at 2");
+  const notDue = await s.exec(["check", "--mock"], { now: at(7 * 24 + 1), mockResponses: { [HASH_A]: "alive" } });
+  assert.match(notDue.out, /nothing due/);
+  assert.equal(notDue.code, 0, "nothing due exits 0");
   const log = alerts(s.home);
   assert.equal(log.length, 1);
   assert.deepEqual(JSON.parse(log[0]), {
@@ -314,6 +321,8 @@ test("an unknown answer is asked again in the same window, and doesn't hide a fl
   assert.match(retry.out, /github .*ghp_FAKE\s+alive\n/);
   assert.doesNotMatch(retry.out, /slack/, "slack was settled at 24h and isn't asked again");
   assert.match(retry.out, /ALERT: github .*dead at the initial check/);
+  assert.equal(unknown.code, 0, "unknown is not an alert");
+  assert.equal(retry.code, 2);
   assert.equal(alerts(s.home).length, 1);
 });
 
