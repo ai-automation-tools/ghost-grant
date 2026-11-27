@@ -89,6 +89,7 @@ Nothing below blocks go-live.
 - [ ] **Slice 7: Google Workspace adapter.** Same shape, mocked tests. The build plan flags this one as the widest estimate.
 - [ ] **Alert delivery (spec: Should).** A flip alert can also go to a webhook URL from config. Slack and email come after that, if anyone asks.
 - [ ] **`--watch` mode and CSV export (spec: Could).** Only if real users ask for them.
+- [ ] **Mark short-lived tokens.** A credential whose prefix shows a token that expires on its own (a GitHub App installation token, `ghs_`, one hour; a Slack rotating access token, `xoxe.xoxb-`, `xoxe.xoxp-` or `xoxe.xapp-`, 12 hours) is flagged short-lived: `decommission` prints a note that its dead answers will say nothing about the App private key or `xoxe-` refresh token that mints new ones, and `report` (text and `--json`, through the `Report` type) marks it with the same note, so a `clean` verdict can't quietly rest on tokens that were always going to expire. Done when tests cover a manifest with a `ghs_` and an `xoxe.xoxb-` credential (note printed, report marked) and a `ghp_` one (unchanged), and `npm run lint`, `npm test` and `npm run build` pass. (source: https://github.blog/changelog/2026-10-02-stateless-github-app-installation-tokens-rolled-out/, 2026-10-02; https://docs.slack.dev/authentication/using-token-rotation, 2026-11-27)
 
 ### 📚 Docs and agents
 

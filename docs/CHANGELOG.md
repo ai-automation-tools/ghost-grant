@@ -16,6 +16,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 ## Unreleased
 
 **Docs**
+- Roadmap: **Mark short-lived tokens** at the end of the fast-follow slices. From the 2026-11-27 roadmap refresh: since October 2026 every GitHub App installation token is the new stateless `ghs_` format, still expiring in an hour, and Slack's rotating tokens expire in 12; checked at 24h or later they always read dead, which says nothing about the App key or refresh token behind them.
 - ROADMAP: ticked the deploy key item: deploy key with write access on `ghost-grant-site`; its private half is `SITE_ORG_DEPLOY_KEY` in this repo's `registry-publish` environment, which only `main` can use, so the publish workflow must set `environment: registry-publish`.
 - Roadmap: the catalog question is decided (2026-11-22, Mike). The Cronsole catalog ships a weekly `ghostgrant report <agent> --json` template beside the daily re-check.
 - README › Responsible use: check only agents you retired and may test, `--live` sends each token once to its own provider and stores nothing, tokens never go in a manifest, and a report isn't compliance evidence.
