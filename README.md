@@ -204,6 +204,7 @@ carries each credential's last dead answer as `lastVerifiedDeadAt`, and a critic
 | [**📝 examples/**](examples/manifest.yaml) | A sample manifest for a fictional agent, used in the quick start. |
 | [**🧩 schemas/**](schemas/agent-inventory.schema.json) | The Agent Security Suite inventory schema v0.1, vendored unedited. Import and export validate against it. |
 | [**🖥️ site/**](site/app.ts) | The static demo page: a bundled report for a fictional agent, rendered with the `Report` type from `src/`. |
+| [**🤖 skills/**](skills/ghost-grant/SKILL.md) | An agent skill that teaches Claude Code, Codex and other coding agents to install and run GhostGrant and read its output. Copy `skills/ghost-grant/` into your agent's skills folder. |
 | [**🧪 tests/**](tests/cli.test.ts) | Tests for `node --test`, run straight from TypeScript. |
 | [**🔒 SECURITY.md**](SECURITY.md) | How to report a vulnerability, and why every token-shaped fixture here is fake. |
 | [**⚙️ .github/workflows/**](.github/workflows/ci.yml) | CI: `npm ci`, lint, test and build on every push to `main` and every PR. `pages.yml` deploys the demo page on every push to `main`. |
