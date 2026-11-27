@@ -208,7 +208,7 @@ carries each credential's last dead answer as `lastVerifiedDeadAt`, and a critic
 | [**🧪 tests/**](tests/cli.test.ts) | Tests for `node --test`, run straight from TypeScript. |
 | [**🔒 SECURITY.md**](SECURITY.md) | How to report a vulnerability, and why every token-shaped fixture here is fake. |
 | [**⚙️ .github/workflows/**](.github/workflows/ci.yml) | CI: `npm ci`, lint, test and build on every push to `main` and every PR. `pages.yml` deploys the demo page on every push to `main`. |
-| [**🤖 AGENTS.md**](AGENTS.md) | Standing orders for the agent that works the roadmap each week. `CLAUDE.md` imports it for Claude Code. |
+| [**🤖 AGENTS.md**](AGENTS.md) | Standing orders for the agent that works the roadmap each week. Claude Code reads it directly too. |
 
 ## 🔗 Related repositories
 
