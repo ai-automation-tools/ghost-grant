@@ -16,6 +16,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 ## Unreleased
 
 **Docs**
+- ROADMAP: ticked the deploy key item: deploy key with write access on `ghost-grant-site`; its private half is `SITE_ORG_DEPLOY_KEY` in this repo's `registry-publish` environment, which only `main` can use, so the publish workflow must set `environment: registry-publish`.
 - Roadmap: the catalog question is decided (2026-11-22, Mike). The Cronsole catalog ships a weekly `ghostgrant report <agent> --json` template beside the daily re-check.
 - README › Responsible use: check only agents you retired and may test, `--live` sends each token once to its own provider and stores nothing, tokens never go in a manifest, and a report isn't compliance evidence.
 - The docs hub links `docs/UPSTREAMS.md`, which no page linked before.
