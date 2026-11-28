@@ -94,7 +94,7 @@ Nothing below blocks go-live.
 ### 📚 Docs and agents
 
 - [ ] **Re-check lifecycle diagram.** An Archify lifecycle diagram in `docs/diagrams/` (decommission → 24h/7d/30d/90d → clean / dead-so-far / flipped / unknown), code-pinned to `src/run.ts`, with a builder `--check`; embedded on the homepage in Live mode.
-- [ ] **Agent skill.** `skills/ghostgrant/SKILL.md`: decommission a retired agent's manifest, run check, read the report verdicts; installable with `npx skills add ai-automation-tools/ghost-grant`.
+- [x] **Agent skill.** `skills/ghostgrant/SKILL.md`: decommission a retired agent's manifest, run check, read the report verdicts; installable with `npx skills add ai-automation-tools/ghost-grant`. — done 2026-11-28: PR #34 added `skills/ghost-grant/SKILL.md` (folder is `ghost-grant`, not `ghostgrant`; covers decommission, check, report, import, export and scheduling) and linked it from the README
 
 ### 📣 Publish and promote
 
